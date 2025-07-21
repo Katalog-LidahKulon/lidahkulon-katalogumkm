@@ -1,9 +1,11 @@
 import type { Firestore } from "@google-cloud/firestore";
 import { NextResponse, NextRequest } from "next/server";
-import { firestore, bucket } from "@/lib/gcp";
+import { firestore } from "@/lib/gcp";
 import { v4 as uuid } from "uuid";
 import { CreateUmkmSchema } from "@/validations/UmkmSchema";
-import { ImageFileSchema } from "@/validations/ImageSchema";
+import { createFileSchema } from "@/validations/zodValidate";
+import { cloudStorage } from "@/lib/CloudStorage";
+import z from "zod";
 
 // Get All UMKM Data
 export async function GET() {
@@ -23,130 +25,88 @@ export async function GET() {
 
 // Create New UMKM Entry
 export async function POST(req: NextRequest) {
+	const ImgSchema = createFileSchema(10, ["image/jpeg", "image/jpg", "image/png", "image/webp"], true);
+
 	try {
 		const form = await req.formData();
+		const id = `umkm-${uuid()}`;
 
 		const docData = {
-			// ID, Created At
-			id: `umkm-${uuid()}`,
+			id,
 			created_at: new Date(),
 
-			// Name, Owner, Description, Address
 			name: form.get("name"),
 			owner: form.get("owner"),
 			description: form.get("description"),
 			address: form.get("address"),
 
-			// Contacts
 			contacts: {
-				whatsapp: form.get("whatsapp"),
-				email: form.get("email"),
+				phone: form.get("phone"),
+				email: form.get("email")
+			},
+
+			links: {
 				instagram: form.get("instagram"),
 				tiktok: form.get("tiktok"),
+				facebook: form.get("facebook"),
 				youtube: form.get("youtube"),
 				website: form.get("website")
 			},
 
-			// Images
-			thumbnail_img_url: "",
-			background_img_url: "",
-			product_img_urls: [] as string[]
+			images: {}
 		};
 
-		const parseDocData = CreateUmkmSchema.safeParse(docData);
-		if (!parseDocData.success) {
-			return NextResponse.json(
-				{
-					success: false,
-					message: JSON.parse(parseDocData.error.message)
-						.map((e: { message: string }) => e.message)
-						.join(", ")
-				},
-				{ status: 400 }
-			);
-		}
+		CreateUmkmSchema.parse(docData);
 
-		// Thumbnail Image
-		const thumbnail = form.get("thumbnail_img") as File;
-		const thumbnailParse = ImageFileSchema.safeParse(thumbnail);
-		if (!thumbnailParse.success) {
-			return NextResponse.json(
-				{
-					success: false,
-					message: JSON.parse(thumbnailParse.error.message)
-						.map((e: { message: string }) => e.message)
-						.join(", ")
-				},
-				{ status: 400 }
-			);
-		} else {
-			const buf = Buffer.from(await thumbnail.arrayBuffer());
-			const thumbBlob = bucket.file(`umkm/${docData.id}/thumb_${Date.now()}_${thumbnail.name}`);
-			await new Promise((res, rej) => {
-				const s = thumbBlob.createWriteStream({ metadata: { contentType: thumbnail.type } });
-				s.on("finish", res).on("error", rej);
-				s.end(buf);
-			});
-			docData.thumbnail_img_url = `https://storage.googleapis.com/${bucket.name}/${thumbBlob.name}`;
-		}
-
-		// Background Image
-		const background = form.get("background_img") as File;
-		const backgroundParse = ImageFileSchema.safeParse(background);
-		if (!backgroundParse.success) {
-			return NextResponse.json(
-				{
-					success: false,
-					message: JSON.parse(backgroundParse.error.message)
-						.map((e: { message: string }) => e.message)
-						.join(", ")
-				},
-				{ status: 400 }
-			);
-		} else {
-			const buf = Buffer.from(await background.arrayBuffer());
-			const bgBlob = bucket.file(`umkm/${docData.id}/bg_${Date.now()}_${background.name}`);
-			await new Promise((res, rej) => {
-				const s = bgBlob.createWriteStream({ metadata: { contentType: background.type } });
-				s.on("finish", res).on("error", rej);
-				s.end(buf);
-			});
-			docData.background_img_url = `https://storage.googleapis.com/${bucket.name}/${bgBlob.name}`;
-		}
-
-		// Products Images
-		const prodFiles = form.getAll("product_imgs") as File[];
-		let prodFileCount = 1;
-		for (const file of prodFiles) {
-			const productParse = ImageFileSchema.safeParse(file);
-			if (!productParse.success) {
-				return NextResponse.json(
-					{
-						success: false,
-						message: JSON.parse(productParse.error.message)
-							.map((e: { message: string }) => e.message)
-							.join(", ")
-					},
-					{ status: 400 }
-				);
-			} else {
-				const buf = Buffer.from(await file.arrayBuffer());
-				const blob = bucket.file(`umkm/${docData.id}/product_${prodFileCount++}_${Date.now()}_${file.name}`);
-				await new Promise((res, rej) => {
-					const s = blob.createWriteStream({ metadata: { contentType: file.type } });
-					s.on("finish", res).on("error", rej);
-					s.end(buf);
-				});
-				docData.product_img_urls.push(`https://storage.googleapis.com/${bucket.name}/${blob.name}`);
+		const imagesData = {
+			thumbnail: await cloudStorage.save(
+				form.get("img_tn") ? ImgSchema.parse(form.get("img_tn")) : null,
+				`umkm/${id}/tn-${Date.now()}-`
+			),
+			background: await cloudStorage.save(
+				form.get("img_bg") ? ImgSchema.parse(form.get("img_bg")) : null,
+				`umkm/${id}/bg-${Date.now()}-`
+			),
+			products: {
+				"1": await cloudStorage.save(
+					form.get("img_pd_1") ? ImgSchema.parse(form.get("img_pd_1")) : null,
+					`umkm/${id}/pd_1-${Date.now()}-`
+				),
+				"2": await cloudStorage.save(
+					form.get("img_pd_2") ? ImgSchema.parse(form.get("img_pd_2")) : null,
+					`umkm/${id}/pd_2-${Date.now()}-`
+				),
+				"3": await cloudStorage.save(
+					form.get("img_pd_3") ? ImgSchema.parse(form.get("img_pd_3")) : null,
+					`umkm/${id}/pd_3-${Date.now()}-`
+				),
+				"4": await cloudStorage.save(
+					form.get("img_pd_4") ? ImgSchema.parse(form.get("img_pd_4")) : null,
+					`umkm/${id}/pd_4-${Date.now()}-`
+				),
+				"5": await cloudStorage.save(
+					form.get("img_pd_5") ? ImgSchema.parse(form.get("img_pd_5")) : null,
+					`umkm/${id}/pd_5-${Date.now()}-`
+				)
 			}
-		}
+		};
 
-		await (firestore as Firestore).collection("umkm").doc(docData.id).set(docData);
+		await firestore
+			.collection("umkm")
+			.doc(id)
+			.set({
+				...docData,
+				images: imagesData
+			});
 
-		return NextResponse.json({ success: true, id: docData.id }, { status: 201 });
+		return NextResponse.json({ success: true, id }, { status: 201 });
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (e: any) {
+		if (e instanceof z.ZodError) {
+			return NextResponse.json({ success: false, message: z.prettifyError(e) }, { status: 400 });
+		}
+
 		console.error("__POST /api/umkm__ :", e);
-		return NextResponse.json({ success: false, message: e.message }, { status: 500 });
+		return NextResponse.json({ success: false, message: e.message || "Internal Server Error" }, { status: 500 });
 	}
 }
