@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { firestore } from "@/lib/gcp";
-import { UpdateUmkmSchema } from "@/validations/UmkmSchema";
-import { z } from "zod";
 import { cloudStorage } from "@/lib/CloudStorage";
-import { createFileSchema } from "@/validations/zodValidate";
+import { z } from "zod";
+import { createFileSchema } from "@/validations/zodHelper";
+import { UpdateUmkmSchema } from "@/validations/UmkmSchema";
+import { verifyAuth } from "@/lib/auth";
 
 // Get Detail UMKM Data by ID
 export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
@@ -25,6 +26,11 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
 
 // Update UMKM Data by ID
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+	const auth = verifyAuth(req);
+	if (auth instanceof NextResponse) {
+		return auth;
+	}
+
 	const ImgSchema = createFileSchema(10, ["image/jpeg", "image/jpg", "image/png", "image/webp"], true);
 
 	try {
@@ -132,7 +138,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // Delete UMKM Data by ID
-export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+	const auth = verifyAuth(req);
+	if (auth instanceof NextResponse) {
+		return auth;
+	}
+
 	try {
 		const docRef = firestore.collection("umkm").doc(params.id);
 		const docSnap = await docRef.get();

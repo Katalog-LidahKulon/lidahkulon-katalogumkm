@@ -1,11 +1,12 @@
 import type { Firestore } from "@google-cloud/firestore";
 import { NextResponse, NextRequest } from "next/server";
-import { firestore } from "@/lib/gcp";
 import { v4 as uuid } from "uuid";
-import { CreateUmkmSchema } from "@/validations/UmkmSchema";
-import { createFileSchema } from "@/validations/zodValidate";
+import { firestore } from "@/lib/gcp";
 import { cloudStorage } from "@/lib/CloudStorage";
 import z from "zod";
+import { CreateUmkmSchema } from "@/validations/UmkmSchema";
+import { createFileSchema } from "@/validations/zodHelper";
+import { verifyAuth } from "@/lib/auth";
 
 // Get All UMKM Data
 export async function GET() {
@@ -25,6 +26,11 @@ export async function GET() {
 
 // Create New UMKM Entry
 export async function POST(req: NextRequest) {
+	const auth = verifyAuth(req);
+	if (auth instanceof NextResponse) {
+		return auth;
+	}
+
 	const ImgSchema = createFileSchema(10, ["image/jpeg", "image/jpg", "image/png", "image/webp"], true);
 
 	try {

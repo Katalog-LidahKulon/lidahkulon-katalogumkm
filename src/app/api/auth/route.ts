@@ -1,19 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { timingSafeEqual } from "crypto";
 import { AuthSchema } from "@/validations/AuthSchema";
-
-// TODO: JWT Token based authentication & cookie-based session management
-
-enum ErrorMessage {
-	MissingEnv = "ADMIN_PASSWORD environment variable is not configured",
-	InvalidJson = "Invalid JSON body",
-	Unauthorized = "Invalid password",
-	ServerError = "Internal server error"
-}
+import { sign } from "@/lib/jwt";
+import { z } from "zod";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD!;
 if (!ADMIN_PASSWORD) {
-	throw new Error(ErrorMessage.MissingEnv);
+	throw new Error("ADMIN_PASSWORD environment variable is not configured");
 }
 
 function safeCompare(input: string, secret: string): boolean {
@@ -24,41 +17,54 @@ function safeCompare(input: string, secret: string): boolean {
 			return false;
 		}
 		return timingSafeEqual(bufInput, bufSecret);
-	} catch (err) {
-		console.error("safeCompare error:", err);
+	} catch (e) {
+		console.error("safeCompare error:", e);
 		return false;
 	}
 }
 
 // Admin Authentication
 export async function POST(request: NextRequest) {
-	let json: unknown;
-
 	try {
-		json = await request.json();
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	} catch (error) {
-		return NextResponse.json({ success: false, message: ErrorMessage.InvalidJson }, { status: 400 });
+		let reqBody: unknown;
+		try {
+			reqBody = await request.json();
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		} catch (e) {
+			return NextResponse.json({ success: false, message: "Invalid JSON data" }, { status: 400 });
+		}
+
+		const parsedBody = AuthSchema.parse(reqBody);
+
+		if (!safeCompare(parsedBody.password, ADMIN_PASSWORD)) {
+			return NextResponse.json({ success: false, message: "Invalid password" }, { status: 401 });
+		}
+
+		const token = sign({ time: Date.now() });
+
+		const response = NextResponse.json({ success: true }, { status: 200 });
+		response.cookies.set({
+			name: "token",
+			value: token,
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "strict",
+			path: "/",
+			maxAge: 60 * 60 * 24 * 1 // 1 Day
+		});
+		return response;
+	} catch (e) {
+		if (e instanceof z.ZodError) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: z.prettifyError(e)
+				},
+				{ status: 400 }
+			);
+		}
+
+		console.error("Error in POST /api/auth:", e);
+		return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
 	}
-
-	const parse = AuthSchema.safeParse(json);
-	if (!parse.success) {
-		return NextResponse.json(
-			{
-				success: false,
-				message: JSON.parse(parse.error.message)
-					.map((e: { message: string }) => e.message)
-					.join(", ")
-			},
-			{ status: 400 }
-		);
-	}
-
-	const { password } = parse.data;
-
-	if (!safeCompare(password, ADMIN_PASSWORD)) {
-		return NextResponse.json({ success: false, message: ErrorMessage.Unauthorized }, { status: 401 });
-	}
-
-	return NextResponse.json({ success: true, message: "Authentication successful" }, { status: 200 });
 }
