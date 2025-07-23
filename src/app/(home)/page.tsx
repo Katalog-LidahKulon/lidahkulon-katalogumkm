@@ -1,3 +1,5 @@
+// TODO : BUILD FRONTEND
+
 export default function Home() {
 	return (
 		<>

@@ -7,6 +7,7 @@ import z from "zod";
 import { CreateUmkmSchema } from "@/validations/UmkmSchema";
 import { createFileSchema } from "@/validations/zodHelper";
 import { verifyAuth } from "@/lib/auth";
+import { ErrorResponse } from "@/lib/ErrorResponse";
 
 // Get All UMKM Data
 export async function GET() {
@@ -26,9 +27,13 @@ export async function GET() {
 
 // Create New UMKM Entry
 export async function POST(req: NextRequest) {
-	const auth = verifyAuth(req);
-	if (auth instanceof NextResponse) {
-		return auth;
+	try {
+		await verifyAuth(req);
+	} catch (error) {
+		if (error instanceof ErrorResponse) {
+			return NextResponse.json({ success: false, message: error.message }, { status: error.statusCode });
+		}
+		return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
 	}
 
 	const ImgSchema = createFileSchema(10, ["image/jpeg", "image/jpg", "image/png", "image/webp"], true);

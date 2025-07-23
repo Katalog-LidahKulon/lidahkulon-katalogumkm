@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { timingSafeEqual } from "crypto";
 import { AuthSchema } from "@/validations/AuthSchema";
-import { sign } from "@/lib/jwt";
+import { sign } from "@/lib/joseHelper";
 import { z } from "zod";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD!;
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ success: false, message: "Invalid password" }, { status: 401 });
 		}
 
-		const token = sign({ time: Date.now() });
+		const token = await sign({ time: Date.now() });
 
 		const response = NextResponse.json({ success: true }, { status: 200 });
 		response.cookies.set({

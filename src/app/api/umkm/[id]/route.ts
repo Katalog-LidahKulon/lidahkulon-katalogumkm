@@ -5,11 +5,18 @@ import { z } from "zod";
 import { createFileSchema } from "@/validations/zodHelper";
 import { UpdateUmkmSchema } from "@/validations/UmkmSchema";
 import { verifyAuth } from "@/lib/auth";
+import { ErrorResponse } from "@/lib/ErrorResponse";
+
+type RouteContext = {
+	params: { id: string };
+};
 
 // Get Detail UMKM Data by ID
-export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_: NextRequest, { params }: RouteContext) {
 	try {
-		const docRef = firestore.collection("umkm").doc(params.id);
+		const { id } = await params;
+
+		const docRef = firestore.collection("umkm").doc(id);
 		const docSnap = await docRef.get();
 
 		if (!docSnap.exists) {
@@ -25,18 +32,24 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
 }
 
 // Update UMKM Data by ID
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-	const auth = verifyAuth(req);
-	if (auth instanceof NextResponse) {
-		return auth;
+export async function PATCH(req: NextRequest, { params }: RouteContext) {
+	try {
+		await verifyAuth(req);
+	} catch (error) {
+		if (error instanceof ErrorResponse) {
+			return NextResponse.json({ success: false, message: error.message }, { status: error.statusCode });
+		}
+		return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
 	}
 
 	const ImgSchema = createFileSchema(10, ["image/jpeg", "image/jpg", "image/png", "image/webp"], true);
 
 	try {
+		const { id } = await params;
+
 		const form = await req.formData();
 
-		const docRef = firestore.collection("umkm").doc(params.id);
+		const docRef = firestore.collection("umkm").doc(id);
 		const docSnap = await docRef.get();
 
 		if (!docSnap.exists) {
@@ -59,11 +72,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 			},
 
 			links: {
-				instagram: form.get("instagram") || prevData?.contacts?.instagram || "",
-				tiktok: form.get("tiktok") || prevData?.contacts?.tiktok || "",
-				facebook: form.get("facebook") || prevData?.contacts?.facebook || "",
-				youtube: form.get("youtube") || prevData?.contacts?.youtube || "",
-				website: form.get("website") || prevData?.contacts?.website || ""
+				instagram: form.get("instagram") || prevData?.links?.instagram || "",
+				tiktok: form.get("tiktok") || prevData?.links?.tiktok || "",
+				facebook: form.get("facebook") || prevData?.links?.facebook || "",
+				youtube: form.get("youtube") || prevData?.links?.youtube || "",
+				website: form.get("website") || prevData?.links?.website || ""
 			}
 		};
 
@@ -138,14 +151,20 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // Delete UMKM Data by ID
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-	const auth = verifyAuth(req);
-	if (auth instanceof NextResponse) {
-		return auth;
+export async function DELETE(req: NextRequest, { params }: RouteContext) {
+	try {
+		await verifyAuth(req);
+	} catch (error) {
+		if (error instanceof ErrorResponse) {
+			return NextResponse.json({ success: false, message: error.message }, { status: error.statusCode });
+		}
+		return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
 	}
 
 	try {
-		const docRef = firestore.collection("umkm").doc(params.id);
+		const { id } = await params;
+
+		const docRef = firestore.collection("umkm").doc(id);
 		const docSnap = await docRef.get();
 
 		if (!docSnap.exists) {

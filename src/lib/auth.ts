@@ -1,17 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
-import { verify } from "@/lib/jwt";
+import { ErrorResponse } from "./ErrorResponse";
+import { NextRequest } from "next/server";
+import { read } from "@/lib/joseHelper";
 
-export const verifyAuth = (req: NextRequest) => {
+export const verifyAuth = async (req: NextRequest) => {
 	const token = req.cookies.get("token")?.value;
 	if (!token) {
-		return NextResponse.json({ success: false, message: "Authentication token is missing" }, { status: 401 });
+		throw new ErrorResponse(401, "Unauthenticated");
 	}
 
 	try {
-		const decoded = verify(token);
-		return decoded;
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	} catch (error) {
-		return NextResponse.json({ success: false, message: "Invalid or expired authentication token" }, { status: 403 });
+		const payload = await read(token);
+		return payload;
+	} catch {
+		throw new ErrorResponse(403, "Invalid or expired authentication");
 	}
 };
