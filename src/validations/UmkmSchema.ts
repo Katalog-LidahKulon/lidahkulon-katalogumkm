@@ -6,8 +6,9 @@ export const CreateUmkmSchema = z.object({
 	created_at: z.date(),
 
 	// Required Fields
-	name: z.string().min(1, "Name is required").max(200, "Name must be at most 200 characters"),
 	owner: z.string().min(1, "Owner is required").max(200, "Owner must be at most 200 characters"),
+	name: z.string().min(1, "Name is required").max(200, "Name must be at most 200 characters"),
+	tag: z.string().min(1, "Tag is required").max(200, "Tag must be at most 200 characters"),
 	description: z.string().min(1, "Description is required").max(2000, "Description must be at most 2000 characters"),
 	address: z.string().min(1, "Address is required").max(500, "Address must be at most 500 characters"),
 
@@ -32,8 +33,9 @@ export const CreateUmkmSchema = z.object({
 });
 
 export const UpdateUmkmSchema = z.object({
-	name: z.string().max(200, "Name must be at most 200 characters").optional(),
 	owner: z.string().max(200, "Owner must be at most 200 characters").optional(),
+	name: z.string().max(200, "Name must be at most 200 characters").optional(),
+	tag: z.string().max(200, "Tag must be at most 200 characters").optional(),
 	description: z.string().max(2000, "Description must be at most 2000 characters").optional(),
 	address: z.string().max(500, "Address must be at most 500 characters").optional(),
 

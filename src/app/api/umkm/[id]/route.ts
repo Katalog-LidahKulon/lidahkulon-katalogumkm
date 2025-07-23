@@ -61,8 +61,9 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 		const newData: Record<string, unknown> = {
 			...prevData,
 
-			name: form.get("name") || prevData?.name,
 			owner: form.get("owner") || prevData?.owner,
+			name: form.get("name") || prevData?.name,
+			tag: form.get("tag") || prevData?.tag,
 			description: form.get("description") || prevData?.description,
 			address: form.get("address") || prevData?.address,
 

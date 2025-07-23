@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-	title: "Katalog UMKM Kelurahan Lidah Kulon",
+	title: "Katalog UMKM Lidah Kulon",
 	description:
 		"Katalog UMKM Kelurahan Lidah Kulon, informasi tentang usaha kecil dan menengah yang berada di Kelurahan Lidah Kulon, Kecamatan Lakarsantri, Kota Surabaya, Jawa Timur."
 };

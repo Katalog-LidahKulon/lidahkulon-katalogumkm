@@ -3,17 +3,23 @@ import { verifyAuth } from "./lib/auth";
 import { ErrorResponse } from "./lib/ErrorResponse";
 
 export const config = {
-	matcher: ["/admin/dashboard/:path*"]
+	matcher: ["/admin/:path*"]
 };
 
 export async function middleware(req: NextRequest) {
+	const { pathname } = req.nextUrl;
+
 	try {
-		await verifyAuth(req);
+		const auth = await verifyAuth(req);
+
+		if (auth && pathname.startsWith("/admin/auth")) {
+			return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+		}
+
 		return NextResponse.next();
 	} catch (e) {
-		if (e instanceof ErrorResponse) {
-			return NextResponse.json({ success: false, message: e.message }, { status: e.statusCode });
+		if (e instanceof ErrorResponse && !pathname.startsWith("/admin/auth")) {
+			return NextResponse.redirect(new URL("/admin/auth", req.url));
 		}
-		return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
 	}
 }

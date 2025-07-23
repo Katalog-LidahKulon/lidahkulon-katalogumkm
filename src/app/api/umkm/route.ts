@@ -1,4 +1,3 @@
-import type { Firestore } from "@google-cloud/firestore";
 import { NextResponse, NextRequest } from "next/server";
 import { v4 as uuid } from "uuid";
 import { firestore } from "@/lib/gcp";
@@ -8,15 +7,12 @@ import { CreateUmkmSchema } from "@/validations/UmkmSchema";
 import { createFileSchema } from "@/validations/zodHelper";
 import { verifyAuth } from "@/lib/auth";
 import { ErrorResponse } from "@/lib/ErrorResponse";
+import { getUmkmList } from "@/lib/data/umkm";
 
 // Get All UMKM Data
 export async function GET() {
 	try {
-		const snapshot = await (firestore as Firestore).collection("umkm").get();
-		const data = snapshot.docs.map((doc) => ({
-			id: doc.id,
-			...(doc.data() as Record<string, unknown>)
-		}));
+		const data = await getUmkmList();
 		return NextResponse.json({ success: true, data });
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (e: any) {
@@ -46,8 +42,9 @@ export async function POST(req: NextRequest) {
 			id,
 			created_at: new Date(),
 
-			name: form.get("name"),
 			owner: form.get("owner"),
+			name: form.get("name"),
+			tag: form.get("tag"),
 			description: form.get("description"),
 			address: form.get("address"),
 
