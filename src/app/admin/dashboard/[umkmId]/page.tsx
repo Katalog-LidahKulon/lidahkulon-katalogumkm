@@ -1,0 +1,74 @@
+import Image from "next/image";
+import Header from "@/components/layouts/Header";
+import Footer from "@/components/layouts/Footer";
+import { getUmkmDetail } from "@/lib/data/umkm";
+
+export default async function AdminUmkmDetail({ params }: { params: Promise<{ umkmId: string }> }) {
+	const { umkmId } = await params;
+	const data = await getUmkmDetail(umkmId);
+
+	return (
+		<>
+			<Header />
+
+			<main>
+				<section>
+					<p>{data?.id}</p>
+					<p>{data?.crated_at && new Date(data.crated_at).toDateString()} </p>
+
+					<h1>{data?.name}</h1>
+					<p>{data?.owner}</p>
+					<p>{data?.tag}</p>
+					<p>{data?.description}</p>
+					<p>{data?.address}</p>
+
+					<div>
+						<p>{data?.contacts?.phone}</p>
+						<p>{data?.contacts?.email}</p>
+					</div>
+
+					<div>
+						<p>{data?.links?.instagram}</p>
+						<p>{data?.links?.tiktok}</p>
+						<p>{data?.links?.facebook}</p>
+						<p>{data?.links?.youtube}</p>
+						<p>{data?.links?.website}</p>
+					</div>
+
+					<div>
+						<Image
+							src={data?.images.thumbnail || ""}
+							alt={`${data?.name} Thumbnail`}
+							width={400}
+							height={400}
+							className="w-xs object-cover object-center"
+						/>
+
+						<Image
+							src={data?.images.background || ""}
+							alt={`${data?.name} Background`}
+							width={400}
+							height={400}
+							className="w-full object-cover object-center"
+						/>
+
+						<div>
+							{Object.entries(data?.images?.products || {}).map(([key, value], i) => (
+								<Image
+									key={i}
+									src={value || ""}
+									alt={`${data?.name} Product ${key}`}
+									width={600}
+									height={600}
+									className="w-xs object-cover object-center"
+								/>
+							))}
+						</div>
+					</div>
+				</section>
+			</main>
+
+			<Footer />
+		</>
+	);
+}

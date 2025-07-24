@@ -3,7 +3,7 @@ import Header from "@/components/layouts/Header";
 import Footer from "@/components/layouts/Footer";
 import { getUmkmDetail } from "@/lib/data/umkm";
 
-export default async function UmkmDetail({ params }: { params: { id: string } }) {
+export default async function UmkmDetail({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params;
 	const data = await getUmkmDetail(id);
 

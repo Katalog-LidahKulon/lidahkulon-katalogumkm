@@ -1,4 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
+import { revalidateTag } from "next/cache";
 import { v4 as uuid } from "uuid";
 import { firestore } from "@/lib/gcp";
 import { cloudStorage } from "@/lib/CloudStorage";
@@ -106,6 +107,7 @@ export async function POST(req: NextRequest) {
 				...docData,
 				images: imagesData
 			});
+		revalidateTag("umkm");
 
 		return NextResponse.json({ success: true, id }, { status: 201 });
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any

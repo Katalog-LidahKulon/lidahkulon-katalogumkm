@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { firestore } from "@/lib/gcp";
 import { cloudStorage } from "@/lib/CloudStorage";
 import { z } from "zod";
@@ -8,7 +9,7 @@ import { verifyAuth } from "@/lib/auth";
 import { ErrorResponse } from "@/lib/ErrorResponse";
 
 type RouteContext = {
-	params: { id: string };
+	params: Promise<{ id: string }>;
 };
 
 // Get Detail UMKM Data by ID
@@ -138,6 +139,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 		};
 
 		await docRef.update({ ...newData, images: imagesData });
+		revalidateTag("umkm");
 
 		return NextResponse.json({ success: true, message: "UMKM updated successfully" });
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -185,6 +187,7 @@ export async function DELETE(req: NextRequest, { params }: RouteContext) {
 		}
 
 		await docRef.delete();
+		revalidateTag("umkm");
 
 		return NextResponse.json({ success: true, message: "UMKM deleted successfully" }, { status: 200 });
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
