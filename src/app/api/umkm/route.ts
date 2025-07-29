@@ -5,15 +5,27 @@ import { firestore } from "@/lib/gcp";
 import { cloudStorage } from "@/lib/CloudStorage";
 import z from "zod";
 import { CreateUmkmSchema } from "@/validations/UmkmSchema";
-import { createFileSchema } from "@/validations/zodHelper";
+import { ImgSchema } from "@/validations/zodHelper";
 import { verifyAuth } from "@/lib/auth";
 import { ErrorResponse } from "@/lib/ErrorResponse";
 import { getUmkmList } from "@/lib/data/umkm";
+import { UmkmBase } from "@/types/Umkm";
 
 // Get All UMKM Data
-export async function GET() {
+export async function GET(request: NextRequest) {
+	const url = new URL(request.url);
+	const search = url.searchParams.get("search");
+
 	try {
 		const data = await getUmkmList();
+
+		if (search) {
+			return NextResponse.json({
+				success: true,
+				data: data.filter((d: UmkmBase) => d.name.toLowerCase().includes(search.toLowerCase()))
+			});
+		}
+
 		return NextResponse.json({ success: true, data });
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (e: any) {
@@ -33,8 +45,6 @@ export async function POST(req: NextRequest) {
 		return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
 	}
 
-	const ImgSchema = createFileSchema(10, ["image/jpeg", "image/jpg", "image/png", "image/webp"], true);
-
 	try {
 		const form = await req.formData();
 		const id = `umkm-${uuid()}`;
@@ -45,9 +55,10 @@ export async function POST(req: NextRequest) {
 
 			owner: form.get("owner"),
 			name: form.get("name"),
-			tag: form.get("tag"),
+			category: form.get("category"),
 			description: form.get("description"),
 			address: form.get("address"),
+			address_embed: form.get("address_embed"),
 
 			contacts: {
 				phone: form.get("phone"),
@@ -71,10 +82,6 @@ export async function POST(req: NextRequest) {
 			thumbnail: await cloudStorage.save(
 				form.get("img_tn") ? ImgSchema.parse(form.get("img_tn")) : null,
 				`umkm/${id}/tn-${Date.now()}-`
-			),
-			background: await cloudStorage.save(
-				form.get("img_bg") ? ImgSchema.parse(form.get("img_bg")) : null,
-				`umkm/${id}/bg-${Date.now()}-`
 			),
 			products: {
 				"1": await cloudStorage.save(

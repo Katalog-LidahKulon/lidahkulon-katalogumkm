@@ -3,7 +3,7 @@ import { revalidateTag } from "next/cache";
 import { firestore } from "@/lib/gcp";
 import { cloudStorage } from "@/lib/CloudStorage";
 import { z } from "zod";
-import { createFileSchema } from "@/validations/zodHelper";
+import { ImgSchema } from "@/validations/zodHelper";
 import { UpdateUmkmSchema } from "@/validations/UmkmSchema";
 import { verifyAuth } from "@/lib/auth";
 import { ErrorResponse } from "@/lib/ErrorResponse";
@@ -43,8 +43,6 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 		return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
 	}
 
-	const ImgSchema = createFileSchema(10, ["image/jpeg", "image/jpg", "image/png", "image/webp"], true);
-
 	try {
 		const { id } = await params;
 
@@ -64,9 +62,10 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 
 			owner: form.get("owner") || prevData?.owner,
 			name: form.get("name") || prevData?.name,
-			tag: form.get("tag") || prevData?.tag,
+			category: form.get("category") || prevData?.category,
 			description: form.get("description") || prevData?.description,
 			address: form.get("address") || prevData?.address,
+			address_embed: form.get("address_embed") || prevData?.address_embed,
 
 			contacts: {
 				phone: form.get("phone") || prevData?.contacts?.phone || "",
@@ -92,13 +91,6 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 						prevData?.images.thumbnail
 				  )
 				: prevData?.images.thumbnail,
-			background: form.get("img_bg")
-				? await cloudStorage.replace(
-						ImgSchema.parse(form.get("img_bg")),
-						`umkm/${prevData!.id}/bg-${Date.now()}-`,
-						prevData?.images.background
-				  )
-				: prevData?.images.background,
 			products: {
 				"1": form.get("img_pd_1")
 					? await cloudStorage.replace(
@@ -178,7 +170,6 @@ export async function DELETE(req: NextRequest, { params }: RouteContext) {
 
 		if (prevData?.images) {
 			await cloudStorage.delete(prevData.images.thumbnail);
-			await cloudStorage.delete(prevData.images.background);
 			for (const [, value] of Object.entries(prevData.images.products || {})) {
 				if (value) {
 					await cloudStorage.delete(value as string);

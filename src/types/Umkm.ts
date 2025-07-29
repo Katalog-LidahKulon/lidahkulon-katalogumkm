@@ -1,10 +1,10 @@
 export type UmkmBase = {
 	id: string;
-	crated_at: Date;
+	created_at: Date;
 
 	owner: string;
 	name: string;
-	tag: string;
+	category: string;
 	description: string;
 	address: string;
 
@@ -14,6 +14,8 @@ export type UmkmBase = {
 };
 
 export type UmkmDetail = UmkmBase & {
+	address_embed: string;
+
 	contacts: {
 		email: string;
 		phone: string;
@@ -28,7 +30,6 @@ export type UmkmDetail = UmkmBase & {
 	};
 
 	images: {
-		background: string;
 		products: {
 			[key: string]: string;
 		};

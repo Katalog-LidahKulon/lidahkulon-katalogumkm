@@ -5,12 +5,15 @@ import { unstable_cache } from "next/cache";
 export const getUmkmList: () => Promise<UmkmBase[] | []> = unstable_cache(
 	async () => {
 		const snap = await firestore.collection("umkm").get();
-		const data = snap.docs.map((doc) => ({
-			id: doc.id,
-			...(doc.data() as Record<string, unknown>)
-		}));
+		const data = snap.docs.map((doc) => {
+			const docData = doc.data();
+			return {
+				...docData,
+				created_at: docData.created_at.toDate()
+			} as UmkmBase;
+		});
 
-		return data as UmkmBase[] | [];
+		return data;
 	},
 	[],
 	{ tags: ["umkm"] }
@@ -23,7 +26,10 @@ export const getUmkmDetail: (id: string) => Promise<UmkmDetail | null> = unstabl
 
 		if (!snap.exists) return null;
 
-		return snap.data() as UmkmDetail;
+		return {
+			...snap.data(),
+			created_at: snap.data()?.created_at.toDate()
+		} as UmkmDetail;
 	},
 	[],
 	{ tags: ["umkm"] }

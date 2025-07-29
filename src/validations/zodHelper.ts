@@ -12,3 +12,5 @@ export const createFileSchema = (maxMB: number, types: string[], optional = fals
 
 	return optional ? base.optional() : base;
 };
+
+export const ImgSchema = createFileSchema(10, ["image/jpeg", "image/jpg", "image/png", "image/webp"], true);
