@@ -7,6 +7,7 @@ import { ImgSchema } from "@/validations/zodHelper";
 import { UpdateUmkmSchema } from "@/validations/UmkmSchema";
 import { verifyAuth } from "@/lib/auth";
 import { ErrorResponse } from "@/lib/ErrorResponse";
+import { getUmkmDetail } from "@/lib/data/umkm";
 
 type RouteContext = {
 	params: Promise<{ id: string }>;
@@ -16,15 +17,11 @@ type RouteContext = {
 export async function GET(_: NextRequest, { params }: RouteContext) {
 	try {
 		const { id } = await params;
+		const data = await getUmkmDetail(id);
 
-		const docRef = firestore.collection("umkm").doc(id);
-		const docSnap = await docRef.get();
+		if (!data) return NextResponse.json({ success: false, message: "UMKM not found" }, { status: 404 });
 
-		if (!docSnap.exists) {
-			return NextResponse.json({ success: false, message: "UMKM not found" }, { status: 404 });
-		}
-
-		return NextResponse.json({ success: true, data: docSnap.data() });
+		return NextResponse.json({ success: true, data });
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (e: any) {
 		console.error("__GET /api/umkm/[id]__ :", e);

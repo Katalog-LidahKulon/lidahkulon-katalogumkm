@@ -13,16 +13,6 @@ import SvgSearch from "@/assets/svgs/search-normal";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-// Kuliner
-// Kerajinan
-// Fashion
-// Jasa
-// Furniture
-// Ritel
-// Pertanian
-// Peternakan
-// Kesehatan
-
 type SortOption = "newest" | "oldest" | "a-z" | "z-a";
 const sorts = [
 	{
@@ -157,10 +147,15 @@ export default function PageUmkm() {
 						/>
 					</div>
 
-					<div className="flex flex-col gap-8 items-center">
-						<h1 className="font-playfair text-center text-neutral-800 text-3xl sm:text-4xl lg:text-5xl">
+					<div className="w-full max-w-2xl flex flex-col gap-3 items-center">
+						<h1 className="mb-2 font-playfair text-center text-neutral-800 text-3xl sm:text-4xl lg:text-5xl">
 							Katalog UMKM Lidah Kulon
 						</h1>
+						<div className="w-6/12 border border-t border-neutral-400" />
+						<p className="text-center text-lg text-neutral-600">
+							Satu tempat untuk mengenal dan mendukung UMKM Lidah Kulon. Cek produk, hubungi langsung, dan bantu
+							tumbuhkan ekonomi lokal!
+						</p>
 					</div>
 				</section>
 

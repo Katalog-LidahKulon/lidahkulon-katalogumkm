@@ -65,9 +65,9 @@ export default function Header() {
 					aria-label="Menu Toggle"
 					className="visible md:invisible cursor-pointer w-8 flex flex-col items-end gap-2"
 				>
-					<div className="w-full border" />
-					<div className="w-8/12 border" />
-					<div className="w-full border" />
+					<div className={`w-full border transition-all ${isOpen ? "translate-x-1/3" : ""}`} />
+					<div className={`w-8/12 border transition-all ${isOpen ? "-translate-x-1/3" : ""}`} />
+					<div className={`w-full border transition-all ${isOpen ? "-translate-x-1/3" : ""}`} />
 				</button>
 			</div>
 

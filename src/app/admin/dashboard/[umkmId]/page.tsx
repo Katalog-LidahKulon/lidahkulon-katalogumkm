@@ -1,8 +1,9 @@
-import Link from "next/link";
+"use client";
+
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import Header from "@/components/layouts/Header";
 import Footer from "@/components/layouts/Footer";
-import { getUmkmDetail } from "@/lib/data/umkm";
 import SvgPhone from "@/assets/svgs/Phone";
 import SvgSms from "@/assets/svgs/sms";
 import SvgSocial1 from "@/assets/svgs/SocialIcons-1";
@@ -12,10 +13,57 @@ import SvgSocial4 from "@/assets/svgs/SocialIcons-4";
 import SvgGlobe from "@/assets/svgs/Globe";
 import SvgMap from "@/assets/svgs/Map_Pin";
 import { formatDate, extractGoogleMapsSrc } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { UmkmDetail } from "@/types/Umkm";
+import { EditableText } from "@/components/shared/EditableText";
+import EditableImage from "@/components/shared/EditableImage";
 
-export default async function AdminUmkmDetail({ params }: { params: Promise<{ umkmId: string }> }) {
-	const { umkmId } = await params;
-	const data = await getUmkmDetail(umkmId);
+// TODO: Editable Image
+
+const categories = [
+	"Kuliner",
+	"Kerajinan",
+	"Fashion",
+	"Jasa",
+	"Furniture",
+	"Ritel",
+	"Pertanian",
+	"Peternakan",
+	"Kesehatan"
+];
+
+export default function AdminUmkmDetail() {
+	const params = useParams();
+	const umkmId = params?.umkmId as string;
+
+	const [refetch, setRefetch] = useState(1);
+	const [data, setData] = useState<UmkmDetail | null>(null);
+	useEffect(() => {
+		const fetchData = async () => {
+			const res = await fetch(`/api/umkm/${umkmId}`);
+			const data = await res.json();
+
+			setData(data.data);
+			setRefetch((p) => p++);
+		};
+		fetchData();
+	}, [refetch, umkmId]);
+
+	const handleUpdateText = async (name: string, val: string) => {
+		try {
+			const form = new FormData();
+			form.append(name, val);
+
+			await fetch(`/api/umkm/${umkmId}`, {
+				method: "PATCH",
+				body: form
+			});
+
+			setRefetch((p) => p + 1);
+		} catch (error) {
+			console.error(error);
+		}
+	};
 
 	return (
 		<>
@@ -27,35 +75,63 @@ export default async function AdminUmkmDetail({ params }: { params: Promise<{ um
 						<div>
 							{/* Main Info */}
 							<div>
-								<h1 className="font-playfair text-3xl sm:text-4xl md:text-5xl text-neutral-800">{data?.name}</h1>
+								<EditableText
+									className="font-playfair text-3xl sm:text-4xl md:text-5xl text-neutral-800"
+									value={data?.name || ""}
+									onUpdate={(val) => handleUpdateText("name", val)}
+								/>
 
 								<div className="flex flex-wrap gap-x-2 items-baseline">
-									<p className="font-normal text-lg text-neutral-800">{data?.owner}</p>
+									<EditableText
+										className="font-normal text-lg text-neutral-800"
+										value={data?.owner || ""}
+										onUpdate={(val) => handleUpdateText("owner", val)}
+									/>
 									<div className="h-1 aspect-square rounded-full bg-neutral-500" />
-									<p className="text-sm">{data?.category}</p>
+									<select
+										value={data?.category}
+										onChange={(e) => handleUpdateText("category", e.target.value)}
+										className="border border-neutral-400"
+									>
+										{categories.map((item, i) => (
+											<option key={i} value={item}>
+												{item}
+											</option>
+										))}
+									</select>
 									<div className="h-1 aspect-square rounded-full bg-neutral-500" />
-									<p className="text-sm">{formatDate(data?.created_at)}</p>
+									<p className="text-sm">{data?.created_at && formatDate(data.created_at)}</p>
 								</div>
 							</div>
 
-							{data?.description && (
-								<p className="w-10/12 mt-10 text-justify text-sm text-neutral-700">{data?.description}</p>
-							)}
+							<p className="w-10/12 min-w-xs max-w-lg">
+								<EditableText
+									className="w-full min-w-xs max-w-lg mt-10 text-justify text-sm text-neutral-700 break-all"
+									value={data?.description || ""}
+									onUpdate={(val) => handleUpdateText("description", val)}
+								/>
+							</p>
 
 							{/* Contact */}
 							<h6 className="mt-10 font-medium text-lg text-neutral-800">Kontak</h6>
 							<div className="mt-1 text-sm sm:text-base grid grid-cols-1 sm:grid-cols-2 gap-2">
 								{data?.contacts?.phone && (
-									<Link href={"tel:" + data.contacts.phone}>
-										<SvgPhone className="inline me-2" />
-										{data.contacts.phone}
-									</Link>
+									<p className="flex gap-8">
+										<SvgPhone />
+										<EditableText
+											value={data?.contacts?.phone || ""}
+											onUpdate={(val) => handleUpdateText("phone", val)}
+										/>
+									</p>
 								)}
 								{data?.contacts?.email && (
-									<Link href={"mailto:" + data.contacts.email}>
-										<SvgSms className="inline me-2" />
-										{data.contacts.email}
-									</Link>
+									<p className="flex gap-8">
+										<SvgSms />
+										<EditableText
+											value={data?.contacts?.email || ""}
+											onUpdate={(val) => handleUpdateText("email", val)}
+										/>
+									</p>
 								)}
 							</div>
 
@@ -63,34 +139,49 @@ export default async function AdminUmkmDetail({ params }: { params: Promise<{ um
 							<h6 className="mt-10 font-medium text-lg text-neutral-800">Tautan & Media Sosial</h6>
 							<div className="mt-1 text-sm sm:text-base grid grid-cols-1 sm:grid-cols-2 gap-2">
 								{data?.links?.instagram && (
-									<Link href={data.links.instagram}>
-										<SvgSocial4 className="inline me-2" />
-										{data.links.instagram}
-									</Link>
+									<p className="flex gap-8">
+										<SvgSocial4 />
+										<EditableText
+											value={data?.links?.instagram || ""}
+											onUpdate={(val) => handleUpdateText("instagram", val)}
+										/>
+									</p>
 								)}
 								{data?.links?.tiktok && (
-									<Link href={data.links.tiktok}>
-										<SvgSocial1 className="inline me-2" />
-										{data.links.tiktok}
-									</Link>
+									<p className="flex gap-8">
+										<SvgSocial1 />
+										<EditableText
+											value={data?.links?.tiktok || ""}
+											onUpdate={(val) => handleUpdateText("tiktok", val)}
+										/>
+									</p>
 								)}
 								{data?.links?.facebook && (
-									<Link href={data.links.facebook}>
-										<SvgSocial2 className="inline me-2" />
-										{data.links.facebook}
-									</Link>
+									<p className="flex gap-8">
+										<SvgSocial2 />
+										<EditableText
+											value={data?.links?.facebook || ""}
+											onUpdate={(val) => handleUpdateText("facebook", val)}
+										/>
+									</p>
 								)}
 								{data?.links?.youtube && (
-									<Link href={data.links.youtube}>
-										<SvgSocial3 className="inline me-2" />
-										{data.links.youtube}
-									</Link>
+									<p className="flex gap-8">
+										<SvgSocial3 />
+										<EditableText
+											value={data?.links?.youtube || ""}
+											onUpdate={(val) => handleUpdateText("youtube", val)}
+										/>
+									</p>
 								)}
 								{data?.links?.website && (
-									<Link href={data.links.website}>
-										<SvgGlobe className="inline me-2" />
-										{data.links.website}
-									</Link>
+									<p className="flex gap-8">
+										<SvgGlobe />
+										<EditableText
+											value={data?.links?.website || ""}
+											onUpdate={(val) => handleUpdateText("website", val)}
+										/>
+									</p>
 								)}
 							</div>
 
@@ -98,16 +189,24 @@ export default async function AdminUmkmDetail({ params }: { params: Promise<{ um
 							<h6 className="mt-10 font-medium text-lg text-neutral-800">Alamat</h6>
 							<div className="mt-1">
 								{data?.address && (
-									<p>
-										<SvgMap className="inline me-2" />
-										{data.address}
+									<p className="flex gap-8">
+										<SvgMap />
+										<EditableText value={data?.address || ""} onUpdate={(val) => handleUpdateText("address", val)} />
 									</p>
 								)}
 								{/* Embed Google Maps */}
+								<div className="mt-2 w-10/12 min-w-xs max-w-lg flex flex-col gap-2">
+									<p className="font-normal text-sm text-neutral-800">Embed Google Maps</p>
+									<EditableText
+										value={data?.address_embed || ""}
+										onUpdate={(val) => handleUpdateText("address_embed", val)}
+										className="w-full break-all"
+									/>
+								</div>
 								{data?.address_embed && (
 									<iframe
 										src={extractGoogleMapsSrc(data.address_embed) || ""}
-										className="mt-2 w-10/12 max-w-sm aspect-video border-2 border-neutral-500 rounded-lg "
+										className="mt-2 w-10/12 aspect-video border-2 border-neutral-500 rounded-lg "
 									/>
 								)}
 							</div>
@@ -115,59 +214,71 @@ export default async function AdminUmkmDetail({ params }: { params: Promise<{ um
 
 						{/* Thumbnail */}
 						<div className="size-full flex items-center justify-center">
-							<Image
-								src={data?.images?.thumbnail || ""}
-								alt={`${data?.name} Thumbnail`}
-								width={400}
-								height={400}
-								priority
-								className="w-full max-w-sm aspect-[2/3] object-cover object-center"
-							/>
+							{data?.images?.thumbnail && (
+								<Image
+									src={data.images.thumbnail}
+									alt={`${data?.name} Thumbnail`}
+									width={400}
+									height={400}
+									priority
+									className="w-full max-w-sm aspect-[2/3] object-cover object-center"
+								/>
+							)}
 						</div>
 					</div>
 
 					{/* Product Images */}
 					<div className="w-full mt-8 h-fit grid grid-flow-row md:grid-cols-2 gap-2 px-2 md:px-8">
 						<div className="flex flex-col gap-2">
-							<Image
-								src={data?.images?.products?.["1"] || ""}
-								alt="Product 1"
-								width={400}
-								height={400}
-								className="w-full aspect-[2/1] object-cover object-center"
-							/>
-							<Image
-								src={data?.images?.products?.["2"] || ""}
-								alt="Product 2"
-								width={400}
-								height={400}
-								className="w-full aspect-[2/1] object-cover object-center"
-							/>
+							{data?.images?.products?.["1"] && (
+								<Image
+									src={data.images.products?.["1"]}
+									alt="Product 1"
+									width={400}
+									height={400}
+									className="w-full aspect-[2/1] object-cover object-center"
+								/>
+							)}
+							{data?.images?.products?.["2"] && (
+								<Image
+									src={data.images.products?.["2"] || ""}
+									alt="Product 2"
+									width={400}
+									height={400}
+									className="w-full aspect-[2/1] object-cover object-center"
+								/>
+							)}
 						</div>
 						<div className="flex flex-col gap-2">
 							<div className="grid grid-cols-2 gap-2">
-								<Image
-									src={data?.images?.products?.["3"] || ""}
-									alt="Product 3"
-									width={400}
-									height={400}
-									className="w-full aspect-[1/1] object-cover object-center"
-								/>
-								<Image
-									src={data?.images?.products?.["4"] || ""}
-									alt="Product 4"
-									width={400}
-									height={400}
-									className="w-full aspect-[1/1] object-cover object-center"
-								/>
+								{data?.images?.products?.["3"] && (
+									<Image
+										src={data?.images?.products?.["3"] || ""}
+										alt="Product 3"
+										width={400}
+										height={400}
+										className="w-full aspect-[1/1] object-cover object-center"
+									/>
+								)}
+								{data?.images?.products?.["4"] && (
+									<Image
+										src={data?.images?.products?.["4"] || ""}
+										alt="Product 4"
+										width={400}
+										height={400}
+										className="w-full aspect-[1/1] object-cover object-center"
+									/>
+								)}
 							</div>
-							<Image
-								src={data?.images?.products?.["5"] || ""}
-								alt="Product 5"
-								width={400}
-								height={400}
-								className="w-full aspect-[2/1] object-cover object-center"
-							/>
+							{data?.images?.products?.["5"] && (
+								<Image
+									src={data?.images?.products?.["5"] || ""}
+									alt="Product 5"
+									width={400}
+									height={400}
+									className="w-full aspect-[2/1] object-cover object-center"
+								/>
+							)}
 						</div>
 					</div>
 				</section>

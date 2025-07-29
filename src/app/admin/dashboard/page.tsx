@@ -7,15 +7,16 @@ import Link from "next/link";
 import { FaTrash, FaPlus, FaSearch } from "react-icons/fa";
 import { formatDate } from "@/lib/utils";
 import { useState, useEffect, useMemo } from "react";
+import CreateUmkmForm from "@/components/CreateUmkmForm";
 
 export default function AdminDashboard() {
+	const [refetched, setRefetched] = useState(1);
 	const [data, setData] = useState<UmkmBase[]>([]);
 	const [filters, setFilters] = useState({ category: "", search: "" });
 	const categories = useMemo(
 		() => data.map((item) => item.category).filter((value, index, self) => self.indexOf(value) === index),
 		[data]
 	);
-
 	useEffect(() => {
 		const getData = async () => {
 			const res = await fetch("/api/umkm");
@@ -24,8 +25,7 @@ export default function AdminDashboard() {
 			setData(data.data as UmkmBase[]);
 		};
 		getData();
-	}, []);
-
+	}, [refetched]);
 	const filteredData = useMemo(() => {
 		let tempData = data;
 
@@ -38,13 +38,16 @@ export default function AdminDashboard() {
 
 		return tempData;
 	}, [data, filters.category, filters.search]);
-
 	const handleDelete = async (id: string) => {
 		await fetch(`/api/umkm/${id}`, { method: "DELETE" });
 
 		const newData = data.filter((item) => item.id !== id);
 		setData(newData);
 	};
+
+	const [showModal, setShowModal] = useState(false);
+
+	const handleRefetch = () => setRefetched((p) => p + 1);
 
 	return (
 		<>
@@ -54,16 +57,17 @@ export default function AdminDashboard() {
 				<div className="container mx-auto px-4">
 					<div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8">
 						<div>
-							<h1 className="font-playfair text-3xl md:text-4xl font-bold text-neutral-800">Admin Dashboard</h1>
+							<h1 className="font-playfair text-3xl md:text-4xl tracking-wide text-neutral-800">Admin Dashboard</h1>
 							<p className="text-neutral-600 mt-2">Kelola data UMKM yang terdaftar dalam sistem.</p>
 						</div>
 						<div className="mt-4 md:mt-0 flex gap-3">
-							<Link
-								href="/admin/dashboard/add"
-								className="flex items-center gap-2 bg-primary hover:bg-primary/80 text-white font-medium py-2 px-4 rounded-xs transition-colors"
+							<button
+								onClick={() => setShowModal(true)}
+								type="button"
+								className="cursor-pointer flex items-center gap-2 bg-primary hover:bg-primary/80 text-white font-medium py-2 px-4 rounded-xs transition-colors"
 							>
 								<FaPlus className="text-sm" /> Tambah UMKM
-							</Link>
+							</button>
 						</div>
 					</div>
 
@@ -184,6 +188,8 @@ export default function AdminDashboard() {
 						</div>
 					</div>
 				</div>
+
+				<CreateUmkmForm show={showModal} setShow={setShowModal} refetch={handleRefetch} />
 			</main>
 
 			<Footer />
