@@ -237,88 +237,76 @@ export default function AdminUmkmDetail() {
 
 						{/* Thumbnail */}
 						<div className="size-full flex items-center justify-center">
-							{data?.images?.thumbnail && (
-								<EditableImage
-									src={data?.images?.thumbnail || ""}
-									onUpdate={(e) => handleUpdateImage(e, "img_tn")}
-									onDropFiles={(files: FileList) => {
-										if (files && files[0]) {
-											handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_tn");
-										}
-									}}
-									className="w-full max-w-sm aspect-[2/3] object-cover object-center"
-								/>
-							)}
+							<EditableImage
+								src={data?.images?.thumbnail || ""}
+								onUpdate={(e) => handleUpdateImage(e, "img_tn")}
+								onDropFiles={(files: FileList) => {
+									if (files && files[0]) {
+										handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_tn");
+									}
+								}}
+								className="w-full max-w-sm aspect-[2/3] object-cover object-center"
+							/>
 						</div>
 					</div>
 
 					{/* Product Images */}
 					<div className="w-full mt-8 h-fit grid grid-flow-row md:grid-cols-2 gap-2 px-2 md:px-8">
 						<div className="flex flex-col gap-2">
-							{data?.images?.products?.["1"] && (
-								<EditableImage
-									src={data?.images?.products?.["1"] || ""}
-									onUpdate={(e) => handleUpdateImage(e, "img_pd_1")}
-									onDropFiles={(files: FileList) => {
-										if (files && files[0]) {
-											handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_1");
-										}
-									}}
-									className="w-full aspect-[2/1] object-cover object-center"
-								/>
-							)}
-							{data?.images?.products?.["2"] && (
-								<EditableImage
-									src={data?.images?.products?.["2"] || ""}
-									onUpdate={(e) => handleUpdateImage(e, "img_pd_2")}
-									onDropFiles={(files: FileList) => {
-										if (files && files[0]) {
-											handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_2");
-										}
-									}}
-									className="w-full aspect-[2/1] object-cover object-center"
-								/>
-							)}
+							<EditableImage
+								src={data?.images?.products?.["1"] || ""}
+								onUpdate={(e) => handleUpdateImage(e, "img_pd_1")}
+								onDropFiles={(files: FileList) => {
+									if (files && files[0]) {
+										handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_1");
+									}
+								}}
+								className="w-full aspect-[2/1] object-cover object-center"
+							/>
+							<EditableImage
+								src={data?.images?.products?.["2"] || ""}
+								onUpdate={(e) => handleUpdateImage(e, "img_pd_2")}
+								onDropFiles={(files: FileList) => {
+									if (files && files[0]) {
+										handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_2");
+									}
+								}}
+								className="w-full aspect-[2/1] object-cover object-center"
+							/>
 						</div>
 						<div className="flex flex-col gap-2">
 							<div className="grid grid-cols-2 gap-2">
-								{data?.images?.products?.["3"] && (
-									<EditableImage
-										src={data?.images?.products?.["3"] || ""}
-										onUpdate={(e) => handleUpdateImage(e, "img_pd_3")}
-										onDropFiles={(files: FileList) => {
-											if (files && files[0]) {
-												handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_3");
-											}
-										}}
-										className="w-full aspect-[1/1] object-cover object-center"
-									/>
-								)}
-								{data?.images?.products?.["4"] && (
-									<EditableImage
-										src={data?.images?.products?.["4"] || ""}
-										onUpdate={(e) => handleUpdateImage(e, "img_pd_4")}
-										onDropFiles={(files: FileList) => {
-											if (files && files[0]) {
-												handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_4");
-											}
-										}}
-										className="w-full aspect-[1/1] object-cover object-center"
-									/>
-								)}
-							</div>
-							{data?.images?.products?.["5"] && (
 								<EditableImage
-									src={data?.images?.products?.["5"] || ""}
-									onUpdate={(e) => handleUpdateImage(e, "img_pd_5")}
+									src={data?.images?.products?.["3"] || ""}
+									onUpdate={(e) => handleUpdateImage(e, "img_pd_3")}
 									onDropFiles={(files: FileList) => {
 										if (files && files[0]) {
-											handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_5");
+											handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_3");
 										}
 									}}
-									className="w-full aspect-[2/1] object-cover object-center"
+									className="w-full aspect-[1/1] object-cover object-center"
 								/>
-							)}
+								<EditableImage
+									src={data?.images?.products?.["4"] || ""}
+									onUpdate={(e) => handleUpdateImage(e, "img_pd_4")}
+									onDropFiles={(files: FileList) => {
+										if (files && files[0]) {
+											handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_4");
+										}
+									}}
+									className="w-full aspect-[1/1] object-cover object-center"
+								/>
+							</div>
+							<EditableImage
+								src={data?.images?.products?.["5"] || ""}
+								onUpdate={(e) => handleUpdateImage(e, "img_pd_5")}
+								onDropFiles={(files: FileList) => {
+									if (files && files[0]) {
+										handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_5");
+									}
+								}}
+								className="w-full aspect-[2/1] object-cover object-center"
+							/>
 						</div>
 					</div>
 				</section>

@@ -2,13 +2,11 @@
 
 import Header from "@/components/layouts/Header";
 import Footer from "@/components/layouts/Footer";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import SvgShow from "@/assets/svgs/Show";
 import SvgHide from "@/assets/svgs/Hide";
 
 export default function AdminAuth() {
-	const router = useRouter();
 	const [pass, setPass] = useState("");
 	const [show, setShow] = useState(false);
 	const [resState, setResState] = useState<{ loading: boolean; error: string | null }>({
@@ -18,6 +16,7 @@ export default function AdminAuth() {
 
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
+		setResState((p) => ({ ...p, loading: true }));
 
 		try {
 			const res = await fetch("/api/auth", {
@@ -31,7 +30,7 @@ export default function AdminAuth() {
 				throw new Error("Password salah, silahkan coba lagi!");
 			}
 
-			router.replace("/admin/dashboard");
+			window.location.href = "/admin/dashboard";
 		} catch (error) {
 			if (error instanceof Error) {
 				setResState((p) => ({ ...p, error: error.message }));
@@ -54,7 +53,7 @@ export default function AdminAuth() {
 							<p className="">Masuk untuk mengelola konten dan data UMKM.</p>
 						</div>
 
-						<form onSubmit={handleLogin} action="">
+						<form action="">
 							<div className="relative w-full">
 								<label htmlFor="pass" className="text-sm text-neutral-700">
 									Password
@@ -87,8 +86,10 @@ export default function AdminAuth() {
 							</div>
 
 							<button
+								disabled={resState.loading}
+								onClick={(e) => handleLogin(e)}
 								type="submit"
-								className="cursor-pointer w-full mt-16 py-2 px-4 rounded-full bg-primary font-medium tracking-wider text-lg text-neutral-50 flex items-center justify-center"
+								className="cursor-pointer w-full mt-16 py-2 px-4 rounded-full bg-primary font-regular tracking-wide text-lg text-neutral-50 flex items-center justify-center hover:bg-primary/90 active:bg-primary disabled:opacity-60"
 							>
 								{resState.loading ? "Loading..." : "Login"}
 							</button>

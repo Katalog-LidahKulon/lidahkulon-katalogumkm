@@ -6,6 +6,7 @@ import TextareaField from "./shared/TextareaField";
 import { Formik, Field } from "formik";
 import * as Yup from "yup";
 import { CheckIcon, Cross1Icon } from "@radix-ui/react-icons";
+import { useState } from "react";
 
 const categories = [
 	"kuliner",
@@ -22,6 +23,7 @@ const categories = [
 const SUPPORTED_FORMATS = ["image/jpg", "image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ImgSchema = Yup.mixed<File>()
+	.optional()
 	.test(
 		"fileFormat",
 		"Format file tidak didukung (hanya jpg, jpeg, png, webp)",
@@ -37,11 +39,12 @@ export default function CreateUmkmForm({
 	setShow: (v: boolean) => void;
 	refetch: () => void;
 }) {
-	if (!show) return null;
-
+	const [state, setState] = useState<{ loading: boolean; error: string | null }>({ loading: false, error: null });
 	const handleHide = () => {
 		setShow(false);
 	};
+
+	if (!show) return null;
 
 	return (
 		<Formik
@@ -59,14 +62,16 @@ export default function CreateUmkmForm({
 				facebook: "",
 				youtube: "",
 				website: "",
-				img_thumbnail: null,
-				img_product_1: null,
-				img_product_2: null,
-				img_product_3: null,
-				img_product_4: null,
-				img_product_5: null
+				img_tn: null,
+				img_pd_1: null,
+				img_pd_2: null,
+				img_pd_3: null,
+				img_pd_4: null,
+				img_pd_5: null
 			}}
 			onSubmit={async (values) => {
+				setState({ loading: true, error: null });
+
 				const formData = new FormData();
 				Object.entries(values).forEach(([key, val]: [string, unknown]) => {
 					if (val instanceof File) {
@@ -86,7 +91,10 @@ export default function CreateUmkmForm({
 					setShow(false);
 					refetch();
 				} catch (error) {
+					setState((p) => ({ ...p, error: "Terjadi kesalahan, silahkan coba lagi!" }));
 					console.error("Gagal mengirim:", error);
+				} finally {
+					setState((p) => ({ ...p, loading: false }));
 				}
 			}}
 			validationSchema={Yup.object().shape({
@@ -114,12 +122,12 @@ export default function CreateUmkmForm({
 				youtube: Yup.string().max(400, "Youtube url tidak boleh lebih dari 400 karakter").notRequired(),
 				website: Yup.string().max(400, "Website url tidak boleh lebih dari 400 karakter").notRequired(),
 
-				img_thumbnail: ImgSchema,
-				img_product_1: ImgSchema.notRequired(),
-				img_product_2: ImgSchema.notRequired(),
-				img_product_3: ImgSchema.notRequired(),
-				img_product_4: ImgSchema.notRequired(),
-				img_product_5: ImgSchema.notRequired()
+				img_tn: ImgSchema,
+				img_pd_1: ImgSchema.notRequired(),
+				img_pd_2: ImgSchema.notRequired(),
+				img_pd_3: ImgSchema.notRequired(),
+				img_pd_4: ImgSchema.notRequired(),
+				img_pd_5: ImgSchema.notRequired()
 			})}
 		>
 			{({ handleSubmit, errors }) => (
@@ -200,7 +208,7 @@ export default function CreateUmkmForm({
 						</div>
 
 						<ImageInputField
-							name="img_thumbnail"
+							name="img_tn"
 							label="Gambar Profil *"
 							className="w-full max-w-xs"
 							dropZoneClass="w-full max-w-xs aspect-[2/3]"
@@ -211,13 +219,13 @@ export default function CreateUmkmForm({
 						<div className="w-full mt-8 h-fit grid grid-flow-row md:grid-cols-2 gap-6">
 							<div className="flex flex-col gap-6">
 								<ImageInputField
-									name="img_product_1"
+									name="img_pd_1"
 									label="Gambar Produk 1"
 									className="w-full"
 									dropZoneClass="w-full aspect-[2/1] object-cover object-center"
 								/>
 								<ImageInputField
-									name="img_product_2"
+									name="img_pd_2"
 									label="Gambar Produk 2"
 									className="w-full"
 									dropZoneClass="w-full aspect-[2/1] object-cover object-center"
@@ -226,20 +234,20 @@ export default function CreateUmkmForm({
 							<div className="flex flex-col gap-6">
 								<div className="grid grid-cols-2 gap-6">
 									<ImageInputField
-										name="img_product_3"
+										name="img_pd_3"
 										label="Gambar Produk 3"
 										className="w-full"
 										dropZoneClass="w-full aspect-[1/1] object-cover object-center"
 									/>
 									<ImageInputField
-										name="img_product_4"
+										name="img_pd_4"
 										label="Gambar Produk 4"
 										className="w-full"
 										dropZoneClass="w-full aspect-[1/1] object-cover object-center"
 									/>
 								</div>
 								<ImageInputField
-									name="img_product_5"
+									name="img_pd_5"
 									label="Gambar Produk 5"
 									className="w-full"
 									dropZoneClass="w-full aspect-[2/1] object-cover object-center"
@@ -255,13 +263,19 @@ export default function CreateUmkmForm({
 							))}
 						</div>
 					)}
+					{state.error && (
+						<div className="mt-6 text-red-600 px-4 py-3 rounded" role="alert">
+							{state.error}
+						</div>
+					)}
 
 					<button
+						disabled={state.loading}
 						type="submit"
-						className="cursor-pointer mt-20 px-4 py-1 rounded bg-primary hover:bg-primary/80 font-normal tracking-wider text-lg text-neutral-50 flex items-center gap-2"
+						className="cursor-pointer mt-20 px-4 py-1 rounded bg-primary hover:bg-primary/80 font-normal tracking-wider text-lg text-neutral-50 flex items-center gap-2 disabled:opacity-60"
 					>
 						<CheckIcon className="size-6" />
-						<span>Simpan</span>
+						<span>{state.loading ? "Menyimpan..." : "Simpan"}</span>
 					</button>
 				</form>
 			)}
