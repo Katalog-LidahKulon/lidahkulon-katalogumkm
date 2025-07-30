@@ -37,9 +37,10 @@ export default function Footer() {
 						<Link
 							target="_blank"
 							href="https://linkedin.com/in/adefathoniprastya"
-							className="text-primary font-normal underline underline-offset-2"
+							className="relative hover:py-1 hover:px-4 text-primary font-normal underline underline-offset-2 hover:text-neutral-50 transition-all duration-500 group"
 						>
-							Urbanara Dev
+							<span>Urbanara Dev</span>
+							<span className="absolute -z-10 top-0 left-0 size-full bg-transparent translate-x-full translate-y-full skew-x-12 transition-all duration-500 group-hover:skew-0 group-hover:translate-0 group-hover:bg-primary/80" />
 						</Link>
 					</p>
 				</div>
@@ -49,32 +50,38 @@ export default function Footer() {
 			<nav className="w-fit">
 				<ul className="flex flex-col gap-4 underline underline-offset-2 text-neutral-800">
 					<li>
-						<Link href="/">Beranda</Link>
+						<Link href="/" className="hover:text-primary">
+							Beranda
+						</Link>
 					</li>
 					<li>
-						<Link href="/umkm">Katalog</Link>
+						<Link href="/umkm" className="hover:text-primary">
+							Katalog
+						</Link>
 					</li>
 					<li>
-						<Link href="/admin/dashboard">Admin</Link>
+						<Link href="/admin/dashboard" className="hover:text-primary">
+							Admin
+						</Link>
 					</li>
 				</ul>
 			</nav>
 
 			{/* Contacts */}
 			<ul className="w-fit flex flex-col gap-4 text-neutral-800">
-				<li className="underline underline-offset-2">
-					<Link href="tel:+62317532044">
+				<li className="underline underline-offset-2 break-words">
+					<Link href="tel:+62317532044" className="hover:text-primary">
 						<SvgPhone className="inline me-2" />
 						(031) 7532044
 					</Link>
 				</li>
-				<li className="underline underline-offset-2">
-					<Link href="mailto:kelurahanlidahkulon@gmail.com">
+				<li className="underline underline-offset-2 break-words">
+					<Link href="mailto:kelurahanlidahkulon@gmail.com" className="hover:text-primary">
 						<SvgSms className="inline me-2" />
 						kelurahanlidahkulon@gmail.com
 					</Link>
 				</li>
-				<li>
+				<li className="break-words">
 					<SvgMap className="inline me-2" />
 					Raya Menganti Lidah Kulon No. 5, Surabaya, Jawa Timur, Indonesia.
 				</li>
@@ -84,7 +91,7 @@ export default function Footer() {
 			<button
 				onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
 				type="button"
-				className="cursor-pointer absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center animate-pulse"
+				className="cursor-pointer absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center animate-pulse hover:text-primary"
 			>
 				<ArrowUpIcon className="size-4 animate-bounce" />
 				<span className="font-normal">Kembali</span>

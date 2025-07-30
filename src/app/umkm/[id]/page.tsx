@@ -46,13 +46,16 @@ export default async function PageUmkmDetail({ params }: { params: Promise<{ id:
 							<h6 className="mt-10 font-medium text-lg text-neutral-800">Kontak</h6>
 							<div className="mt-1 text-sm sm:text-base grid grid-cols-1 sm:grid-cols-2 gap-2">
 								{data?.contacts?.phone && (
-									<Link href={"tel:" + data.contacts.phone}>
+									<Link href={"tel:" + data.contacts.phone} className="underline underline-offset-2 hover:text-primary">
 										<SvgPhone className="inline me-2" />
 										{data.contacts.phone}
 									</Link>
 								)}
 								{data?.contacts?.email && (
-									<Link href={"mailto:" + data.contacts.email}>
+									<Link
+										href={"mailto:" + data.contacts.email}
+										className="underline underline-offset-2 hover:text-primary"
+									>
 										<SvgSms className="inline me-2" />
 										{data.contacts.email}
 									</Link>
@@ -63,31 +66,31 @@ export default async function PageUmkmDetail({ params }: { params: Promise<{ id:
 							<h6 className="mt-10 font-medium text-lg text-neutral-800">Tautan & Media Sosial</h6>
 							<div className="mt-1 text-sm sm:text-base grid grid-cols-1 sm:grid-cols-2 gap-2">
 								{data?.links?.instagram && (
-									<Link href={data.links.instagram}>
+									<Link href={data.links.instagram} className="underline underline-offset-2 hover:text-primary">
 										<SvgSocial4 className="inline me-2" />
 										{data.links.instagram}
 									</Link>
 								)}
 								{data?.links?.tiktok && (
-									<Link href={data.links.tiktok}>
+									<Link href={data.links.tiktok} className="underline underline-offset-2 hover:text-primary">
 										<SvgSocial1 className="inline me-2" />
 										{data.links.tiktok}
 									</Link>
 								)}
 								{data?.links?.facebook && (
-									<Link href={data.links.facebook}>
+									<Link href={data.links.facebook} className="underline underline-offset-2 hover:text-primary">
 										<SvgSocial2 className="inline me-2" />
 										{data.links.facebook}
 									</Link>
 								)}
 								{data?.links?.youtube && (
-									<Link href={data.links.youtube}>
+									<Link href={data.links.youtube} className="underline underline-offset-2 hover:text-primary">
 										<SvgSocial3 className="inline me-2" />
 										{data.links.youtube}
 									</Link>
 								)}
 								{data?.links?.website && (
-									<Link href={data.links.website}>
+									<Link href={data.links.website} className="underline underline-offset-2 hover:text-primary">
 										<SvgGlobe className="inline me-2" />
 										{data.links.website}
 									</Link>
