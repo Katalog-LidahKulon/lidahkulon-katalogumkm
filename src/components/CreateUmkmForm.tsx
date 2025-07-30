@@ -1,12 +1,11 @@
 "use client";
 
-import SvgClose from "@/assets/svgs/Close_Circle";
 import ImageInputField from "./shared/ImageInputField";
 import InputField from "./shared/InputField";
 import TextareaField from "./shared/TextareaField";
 import { Formik, Field } from "formik";
 import * as Yup from "yup";
-import { FaCheck } from "react-icons/fa";
+import { CheckIcon, Cross1Icon } from "@radix-ui/react-icons";
 
 const categories = [
 	"kuliner",
@@ -132,9 +131,9 @@ export default function CreateUmkmForm({
 					<button
 						onClick={handleHide}
 						type="button"
-						className="cursor-pointer absolute top-4 right-4 p-1 rounded hover:bg-neutral-200"
+						className="cursor-pointer absolute top-4 right-4 p-1 rounded border border-neutral-500 hover:bg-red-100"
 					>
-						<SvgClose className="size-8 md:size-10" />
+						<Cross1Icon className="size-4 md:size-6" />
 					</button>
 
 					<div className="mb-8">
@@ -259,10 +258,10 @@ export default function CreateUmkmForm({
 
 					<button
 						type="submit"
-						className="cursor-pointer mt-20 px-8 py-1 rounded bg-primary hover:bg-primary/80 font-normal tracking-wider text-lg text-neutral-50 flex items-center"
+						className="cursor-pointer mt-20 px-4 py-1 rounded bg-primary hover:bg-primary/80 font-normal tracking-wider text-lg text-neutral-50 flex items-center gap-2"
 					>
-						<FaCheck className="inline me-2" />
-						Simpan
+						<CheckIcon className="size-6" />
+						<span>Simpan</span>
 					</button>
 				</form>
 			)}

@@ -4,7 +4,7 @@ import { UmkmBase } from "@/types/Umkm";
 import Header from "@/components/layouts/Header";
 import Footer from "@/components/layouts/Footer";
 import Link from "next/link";
-import { FaTrash, FaPlus, FaSearch } from "react-icons/fa";
+import { TrashIcon, PlusIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import { formatDate } from "@/lib/utils";
 import { useState, useEffect, useMemo } from "react";
 import CreateUmkmForm from "@/components/CreateUmkmForm";
@@ -57,16 +57,16 @@ export default function AdminDashboard() {
 				<div className="container mx-auto px-4">
 					<div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8">
 						<div>
-							<h1 className="font-playfair text-3xl md:text-4xl tracking-wide text-neutral-800">Admin Dashboard</h1>
+							<h1 className="font-playfair text-3xl md:text-4xl text-neutral-800">Admin Dashboard</h1>
 							<p className="text-neutral-600 mt-2">Kelola data UMKM yang terdaftar dalam sistem.</p>
 						</div>
 						<div className="mt-4 md:mt-0 flex gap-3">
 							<button
 								onClick={() => setShowModal(true)}
 								type="button"
-								className="cursor-pointer flex items-center gap-2 bg-primary hover:bg-primary/80 text-white font-medium py-2 px-4 rounded-xs transition-colors"
+								className="cursor-pointer flex items-center gap-2 bg-primary hover:bg-primary/80 text-neutral-50 font-normal py-2 px-4 rounded-xs transition-colors"
 							>
-								<FaPlus className="text-sm" /> Tambah UMKM
+								<PlusIcon className="size-5" /> Tambah UMKM
 							</button>
 						</div>
 					</div>
@@ -83,7 +83,7 @@ export default function AdminDashboard() {
 									placeholder="Cari UMKM..."
 									className="w-full pl-10 pr-4 py-2 border-2 border-neutral-300 rounded-xs focus:ring-0 focus:outline-0 focus:border-primary"
 								/>
-								<FaSearch className="absolute left-3 top-3 text-neutral-400" />
+								<MagnifyingGlassIcon className="absolute left-3 top-3 size-5 text-neutral-400" />
 							</form>
 
 							{/* Category */}
@@ -162,7 +162,7 @@ export default function AdminDashboard() {
 												<p className="text-neutral-900">{umkm.owner}</p>
 											</td>
 											<td className="px-6 py-4 whitespace-nowrap">
-												<p className="px-3 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-neutral-100 text-neutral-700">
+												<p className="px-3 py-0.5 inline-flex text-xs tracking-wider font-medium rounded-full bg-neutral-200 text-neutral-700">
 													{umkm.category}
 												</p>
 											</td>
@@ -178,7 +178,7 @@ export default function AdminDashboard() {
 													type="button"
 													className="cursor-pointer flex items-center gap-1 text-red-600 hover:text-red-800"
 												>
-													<FaTrash className="text-sm" /> Hapus
+													<TrashIcon className="size-5" /> Hapus
 												</button>
 											</td>
 										</tr>

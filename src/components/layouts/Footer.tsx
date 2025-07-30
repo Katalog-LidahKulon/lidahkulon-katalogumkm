@@ -8,7 +8,7 @@ import ImgLogo3 from "@/assets/imgs/logo_urbanara.png";
 import SvgPhone from "@/assets/svgs/Phone";
 import SvgSms from "@/assets/svgs/sms";
 import SvgMap from "@/assets/svgs/Map_Pin";
-import { FaArrowUp } from "react-icons/fa";
+import { ArrowUpIcon } from "@radix-ui/react-icons";
 
 export default function Footer() {
 	return (
@@ -86,7 +86,7 @@ export default function Footer() {
 				type="button"
 				className="cursor-pointer absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center animate-pulse"
 			>
-				<FaArrowUp className="text-sm animate-bounce" />
+				<ArrowUpIcon className="size-4 animate-bounce" />
 				<span className="font-normal">Kembali</span>
 			</button>
 		</footer>
