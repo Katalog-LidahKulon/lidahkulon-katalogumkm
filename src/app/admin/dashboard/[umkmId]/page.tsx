@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useParams } from "next/navigation";
 import Header from "@/components/layouts/Header";
 import Footer from "@/components/layouts/Footer";
@@ -17,8 +16,7 @@ import { useEffect, useState } from "react";
 import { UmkmDetail } from "@/types/Umkm";
 import { EditableText } from "@/components/shared/EditableText";
 import EditableImage from "@/components/shared/EditableImage";
-
-// TODO: Editable Image
+import { Pencil2Icon } from "@radix-ui/react-icons";
 
 const categories = [
 	"Kuliner",
@@ -65,13 +63,38 @@ export default function AdminUmkmDetail() {
 		}
 	};
 
+	const handleUpdateImage = async (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
+		const files = e.target.files;
+
+		if (files && files[0]) {
+			const formData = new FormData();
+			formData.append(name, files[0]);
+
+			try {
+				await fetch(`/api/umkm/${umkmId}`, {
+					method: "PATCH",
+					body: formData
+				});
+				setRefetch((p) => p + 1);
+			} catch (error) {
+				console.error(error);
+			}
+		}
+	};
+
 	return (
 		<>
 			<Header />
 
 			<main>
-				<section className="w-full min-h-screen pt-32 pb-16">
-					<div className="w-full h-fit grid grid-flow-row md:grid-cols-2 gap-x-4 gap-y-8 md:gap-8 px-4 sm:px-8 lg:px-16">
+				<section className="w-full min-h-screen pt-24 pb-16">
+					{/* Instruction */}
+					<p className="pb-8 px-4 sm:px-8 lg:px-16 text-lg text-primary text-center">
+						Elemenen dengan ikon <Pencil2Icon className="size-5 text-primary inline mx-1" /> dapat langsung di edit
+						untuk memperbarui data.
+					</p>
+
+					<div className="w-full h-fit grid grid-flow-row md:grid-cols-2 gap-x-4 gap-y-8 md:gap-8 px-6 sm:px-8 lg:px-16">
 						<div>
 							{/* Main Info */}
 							<div>
@@ -215,12 +238,14 @@ export default function AdminUmkmDetail() {
 						{/* Thumbnail */}
 						<div className="size-full flex items-center justify-center">
 							{data?.images?.thumbnail && (
-								<Image
-									src={data.images.thumbnail}
-									alt={`${data?.name} Thumbnail`}
-									width={400}
-									height={400}
-									priority
+								<EditableImage
+									src={data?.images?.thumbnail || ""}
+									onUpdate={(e) => handleUpdateImage(e, "img_tn")}
+									onDropFiles={(files: FileList) => {
+										if (files && files[0]) {
+											handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_tn");
+										}
+									}}
 									className="w-full max-w-sm aspect-[2/3] object-cover object-center"
 								/>
 							)}
@@ -231,20 +256,26 @@ export default function AdminUmkmDetail() {
 					<div className="w-full mt-8 h-fit grid grid-flow-row md:grid-cols-2 gap-2 px-2 md:px-8">
 						<div className="flex flex-col gap-2">
 							{data?.images?.products?.["1"] && (
-								<Image
-									src={data.images.products?.["1"]}
-									alt="Product 1"
-									width={400}
-									height={400}
+								<EditableImage
+									src={data?.images?.products?.["1"] || ""}
+									onUpdate={(e) => handleUpdateImage(e, "img_pd_1")}
+									onDropFiles={(files: FileList) => {
+										if (files && files[0]) {
+											handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_1");
+										}
+									}}
 									className="w-full aspect-[2/1] object-cover object-center"
 								/>
 							)}
 							{data?.images?.products?.["2"] && (
-								<Image
-									src={data.images.products?.["2"] || ""}
-									alt="Product 2"
-									width={400}
-									height={400}
+								<EditableImage
+									src={data?.images?.products?.["2"] || ""}
+									onUpdate={(e) => handleUpdateImage(e, "img_pd_2")}
+									onDropFiles={(files: FileList) => {
+										if (files && files[0]) {
+											handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_2");
+										}
+									}}
 									className="w-full aspect-[2/1] object-cover object-center"
 								/>
 							)}
@@ -252,30 +283,39 @@ export default function AdminUmkmDetail() {
 						<div className="flex flex-col gap-2">
 							<div className="grid grid-cols-2 gap-2">
 								{data?.images?.products?.["3"] && (
-									<Image
+									<EditableImage
 										src={data?.images?.products?.["3"] || ""}
-										alt="Product 3"
-										width={400}
-										height={400}
+										onUpdate={(e) => handleUpdateImage(e, "img_pd_3")}
+										onDropFiles={(files: FileList) => {
+											if (files && files[0]) {
+												handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_3");
+											}
+										}}
 										className="w-full aspect-[1/1] object-cover object-center"
 									/>
 								)}
 								{data?.images?.products?.["4"] && (
-									<Image
+									<EditableImage
 										src={data?.images?.products?.["4"] || ""}
-										alt="Product 4"
-										width={400}
-										height={400}
+										onUpdate={(e) => handleUpdateImage(e, "img_pd_4")}
+										onDropFiles={(files: FileList) => {
+											if (files && files[0]) {
+												handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_4");
+											}
+										}}
 										className="w-full aspect-[1/1] object-cover object-center"
 									/>
 								)}
 							</div>
 							{data?.images?.products?.["5"] && (
-								<Image
+								<EditableImage
 									src={data?.images?.products?.["5"] || ""}
-									alt="Product 5"
-									width={400}
-									height={400}
+									onUpdate={(e) => handleUpdateImage(e, "img_pd_5")}
+									onDropFiles={(files: FileList) => {
+										if (files && files[0]) {
+											handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_5");
+										}
+									}}
 									className="w-full aspect-[2/1] object-cover object-center"
 								/>
 							)}

@@ -3,21 +3,23 @@ import { Modal } from "@/components/shared/Modal";
 import { Pencil2Icon, TrashIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
+import clsx from "clsx";
 
 interface EditableImageProps {
 	src: string;
 	onUpdate: (e: React.ChangeEvent<HTMLInputElement>, ...args: Array<unknown>) => void | Promise<void>;
 	onDropFiles?: (files: FileList, ...args: Array<unknown>) => void | Promise<void>;
 	onDelete?: (...args: Array<unknown>) => void | Promise<void>;
+	className?: string;
 }
 
-export default function EditableImage({ src, onUpdate, onDropFiles, onDelete }: EditableImageProps) {
+export default function EditableImage({ src, onUpdate, onDropFiles, onDelete, className }: EditableImageProps) {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const { dragHandler } = useDragAndDrop({ onDropFiles });
 
 	return (
 		<div>
-			<div className="overflow-clip relative w-full aspect-video rounded-sm border border-neutral-400 flex items-center justify-center group cursor-pointer">
+			<div className="overflow-clip relative w-full rounded-sm border border-neutral-400 flex items-center justify-center group cursor-pointer">
 				{/* Image */}
 				<Image
 					{...dragHandler}
@@ -27,7 +29,7 @@ export default function EditableImage({ src, onUpdate, onDropFiles, onDelete }: 
 					width={800}
 					height={450}
 					unoptimized
-					className="size-full aspect-video object-cover rounded-xs"
+					className={clsx("size-full object-cover rounded-xs", className)}
 				/>
 
 				{/* Edit & Delete Buttons */}
