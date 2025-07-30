@@ -13,21 +13,25 @@ export default async function sitemap() {
 		console.error("Expected build error:", error);
 	}
 
-	// Detail UMKM Route
-	const detailUmkmUrls = umkmData.map((d: UmkmBase) => ({
-		url: `${process.env.NEXT_PUBLIC_BASE_URL}/umkm/${d.id}`,
-		lastModified: new Date(),
-		changeFrequency: "weekly",
-		priority: 0.9
-	}));
+	let detailUmkmUrls = [];
+	let detailUmkmAdminUrls = [];
+	if (umkmData.length > 0) {
+		// Detail UMKM Route
+		detailUmkmUrls = umkmData.map((d: UmkmBase) => ({
+			url: `${process.env.NEXT_PUBLIC_BASE_URL}/umkm/${d.id}`,
+			lastModified: new Date(),
+			changeFrequency: "weekly",
+			priority: 0.9
+		}));
 
-	// Detail UMKM Admin Route
-	const detailUmkmAdminUrls = umkmData.map((d: UmkmBase) => ({
-		url: `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/${d.id}`,
-		lastModified: new Date(),
-		changeFrequency: "weekly",
-		priority: 0.6
-	}));
+		// Detail UMKM Admin Route
+		detailUmkmAdminUrls = umkmData.map((d: UmkmBase) => ({
+			url: `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/${d.id}`,
+			lastModified: new Date(),
+			changeFrequency: "weekly",
+			priority: 0.6
+		}));
+	}
 
 	return [
 		// Home
