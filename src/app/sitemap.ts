@@ -13,9 +13,9 @@ export default async function sitemap() {
 		console.error("Expected build error:", error);
 	}
 
-	let detailUmkmUrls = [];
-	let detailUmkmAdminUrls = [];
-	if (umkmData.length > 0) {
+	let detailUmkmUrls: { url: string; lastModified: Date; changeFrequency: string; priority: number }[] = [];
+	let detailUmkmAdminUrls: { url: string; lastModified: Date; changeFrequency: string; priority: number }[] = [];
+	if (Array.isArray(umkmData) && umkmData.length > 0) {
 		// Detail UMKM Route
 		detailUmkmUrls = umkmData.map((d: UmkmBase) => ({
 			url: `${process.env.NEXT_PUBLIC_BASE_URL}/umkm/${d.id}`,
@@ -63,8 +63,8 @@ export default async function sitemap() {
 			priority: 0.6
 		},
 		// Detail UMKM
-		...detailUmkmUrls,
+		...(Array.isArray(detailUmkmUrls) && detailUmkmUrls.length > 0 ? detailUmkmUrls : []),
 		// Detail UMKM Admin
-		...detailUmkmAdminUrls
+		...(Array.isArray(detailUmkmAdminUrls) && detailUmkmAdminUrls.length > 0 ? detailUmkmAdminUrls : [])
 	];
 }
