@@ -42,33 +42,26 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 
 	try {
 		const { id } = await params;
-
-		const form = await req.formData();
-
 		const docRef = firestore.collection("umkm").doc(id);
 		const docSnap = await docRef.get();
-
 		if (!docSnap.exists) {
 			return NextResponse.json({ success: false, message: "UMKM not found" }, { status: 404 });
 		}
 
+		const form = await req.formData();
 		const prevData = docSnap.data();
-
 		const newData: Record<string, unknown> = {
 			...prevData,
-
-			owner: form.get("owner") || prevData?.owner,
 			name: form.get("name") || prevData?.name,
+			owner: form.get("owner") || prevData?.owner,
 			category: form.get("category") || prevData?.category,
 			description: form.get("description") || prevData?.description,
 			address: form.get("address") || prevData?.address,
 			address_embed: form.get("address_embed") || prevData?.address_embed,
-
 			contacts: {
 				phone: form.get("phone") || prevData?.contacts?.phone || "",
 				email: form.get("email") || prevData?.contacts?.email || ""
 			},
-
 			links: {
 				instagram: form.get("instagram") || prevData?.links?.instagram || "",
 				tiktok: form.get("tiktok") || prevData?.links?.tiktok || "",
@@ -80,50 +73,22 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 
 		UpdateUmkmSchema.parse(newData);
 
+		const replaceImageField = async (fieldKey: string, prevUrl: string | null | undefined): Promise<string | null> => {
+			const entry = form.get(fieldKey);
+			if (entry instanceof File) {
+				const file = ImgSchema.parse(entry);
+				return await cloudStorage.replace(file, `umkm/${id}/${fieldKey}-${Date.now()}-`, prevUrl);
+			}
+			return prevUrl || null;
+		};
 		const imagesData = {
-			thumbnail: form.get("img_tn")
-				? await cloudStorage.replace(
-						ImgSchema.parse(form.get("img_tn")),
-						`umkm/${prevData!.id}/tn-${Date.now()}-`,
-						prevData?.images.thumbnail
-				  )
-				: prevData?.images.thumbnail,
+			thumbnail: await replaceImageField("img_tn", prevData?.images?.thumbnail),
 			products: {
-				"1": form.get("img_pd_1")
-					? await cloudStorage.replace(
-							ImgSchema.parse(form.get("img_pd_1")),
-							`umkm/${prevData!.id}/pd_1-${Date.now()}-`,
-							prevData?.images.products?.["1"]
-					  )
-					: prevData?.images.products?.["1"],
-				"2": form.get("img_pd_2")
-					? await cloudStorage.replace(
-							ImgSchema.parse(form.get("img_pd_2")),
-							`umkm/${prevData!.id}/pd_2-${Date.now()}-`,
-							prevData?.images.products?.["2"]
-					  )
-					: prevData?.images.products?.["2"],
-				"3": form.get("img_pd_3")
-					? await cloudStorage.replace(
-							ImgSchema.parse(form.get("img_pd_3")),
-							`umkm/${prevData!.id}/pd_3-${Date.now()}-`,
-							prevData?.images.products?.["3"]
-					  )
-					: prevData?.images.products?.["3"],
-				"4": form.get("img_pd_4")
-					? await cloudStorage.replace(
-							ImgSchema.parse(form.get("img_pd_4")),
-							`umkm/${prevData!.id}/pd_4-${Date.now()}-`,
-							prevData?.images.products?.["4"]
-					  )
-					: prevData?.images.products?.["4"],
-				"5": form.get("img_pd_5")
-					? await cloudStorage.replace(
-							ImgSchema.parse(form.get("img_pd_5")),
-							`umkm/${prevData!.id}/pd_5-${Date.now()}-`,
-							prevData?.images.products?.["5"]
-					  )
-					: prevData?.images.products?.["5"]
+				"1": await replaceImageField("img_pd_1", prevData?.images?.products?.["1"]),
+				"2": await replaceImageField("img_pd_2", prevData?.images?.products?.["2"]),
+				"3": await replaceImageField("img_pd_3", prevData?.images?.products?.["3"]),
+				"4": await replaceImageField("img_pd_4", prevData?.images?.products?.["4"]),
+				"5": await replaceImageField("img_pd_5", prevData?.images?.products?.["5"])
 			}
 		};
 

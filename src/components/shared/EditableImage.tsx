@@ -24,7 +24,7 @@ export default function EditableImage({ src, onUpdate, onDropFiles, onDelete, cl
 				<Image
 					{...dragHandler}
 					onClick={() => setIsModalOpen(true)}
-					src={`${src}?t=${Date.now()}`}
+					src={src}
 					alt="Thumbnail Image"
 					width={800}
 					height={450}

@@ -99,16 +99,18 @@ export default function AdminUmkmDetail() {
 							{/* Main Info */}
 							<div>
 								<EditableText
-									className="font-playfair text-3xl sm:text-4xl md:text-5xl text-neutral-800"
+									placeholder="Nama UMKM"
 									value={data?.name || ""}
 									onUpdate={(val) => handleUpdateText("name", val)}
+									className="font-playfair text-3xl sm:text-4xl md:text-5xl text-neutral-800"
 								/>
 
 								<div className="flex flex-wrap gap-x-2 items-baseline">
 									<EditableText
-										className="font-normal text-lg text-neutral-800"
+										placeholder="Pemilik UMKM"
 										value={data?.owner || ""}
 										onUpdate={(val) => handleUpdateText("owner", val)}
+										className="font-normal text-lg text-neutral-800"
 									/>
 									<div className="h-1 aspect-square rounded-full bg-neutral-500" />
 									<select
@@ -129,9 +131,10 @@ export default function AdminUmkmDetail() {
 
 							<p className="w-10/12 min-w-xs max-w-lg">
 								<EditableText
-									className="w-full min-w-xs max-w-lg mt-10 text-justify text-sm text-neutral-700 break-all"
+									placeholder="Deskripsi UMKM"
 									value={data?.description || ""}
 									onUpdate={(val) => handleUpdateText("description", val)}
+									className="w-full min-w-xs max-w-lg mt-10 text-justify text-sm text-neutral-700 break-all"
 								/>
 							</p>
 
@@ -142,6 +145,7 @@ export default function AdminUmkmDetail() {
 									<p className="flex gap-8">
 										<SvgPhone />
 										<EditableText
+											placeholder="Nomor Telepon"
 											value={data?.contacts?.phone || ""}
 											onUpdate={(val) => handleUpdateText("phone", val)}
 										/>
@@ -151,6 +155,7 @@ export default function AdminUmkmDetail() {
 									<p className="flex gap-8">
 										<SvgSms />
 										<EditableText
+											placeholder="Email"
 											value={data?.contacts?.email || ""}
 											onUpdate={(val) => handleUpdateText("email", val)}
 										/>
@@ -165,6 +170,7 @@ export default function AdminUmkmDetail() {
 									<p className="flex gap-8">
 										<SvgSocial4 />
 										<EditableText
+											placeholder="Instagram"
 											value={data?.links?.instagram || ""}
 											onUpdate={(val) => handleUpdateText("instagram", val)}
 										/>
@@ -174,6 +180,7 @@ export default function AdminUmkmDetail() {
 									<p className="flex gap-8">
 										<SvgSocial1 />
 										<EditableText
+											placeholder="Tiktok"
 											value={data?.links?.tiktok || ""}
 											onUpdate={(val) => handleUpdateText("tiktok", val)}
 										/>
@@ -183,6 +190,7 @@ export default function AdminUmkmDetail() {
 									<p className="flex gap-8">
 										<SvgSocial2 />
 										<EditableText
+											placeholder="Facebook"
 											value={data?.links?.facebook || ""}
 											onUpdate={(val) => handleUpdateText("facebook", val)}
 										/>
@@ -192,6 +200,7 @@ export default function AdminUmkmDetail() {
 									<p className="flex gap-8">
 										<SvgSocial3 />
 										<EditableText
+											placeholder="Youtube"
 											value={data?.links?.youtube || ""}
 											onUpdate={(val) => handleUpdateText("youtube", val)}
 										/>
@@ -201,6 +210,7 @@ export default function AdminUmkmDetail() {
 									<p className="flex gap-8">
 										<SvgGlobe />
 										<EditableText
+											placeholder="Website"
 											value={data?.links?.website || ""}
 											onUpdate={(val) => handleUpdateText("website", val)}
 										/>
@@ -214,13 +224,18 @@ export default function AdminUmkmDetail() {
 								{data?.address && (
 									<p className="flex gap-8">
 										<SvgMap />
-										<EditableText value={data?.address || ""} onUpdate={(val) => handleUpdateText("address", val)} />
+										<EditableText
+											placeholder="Alamat UMKM"
+											value={data?.address || ""}
+											onUpdate={(val) => handleUpdateText("address", val)}
+										/>
 									</p>
 								)}
 								{/* Embed Google Maps */}
 								<div className="mt-2 w-10/12 min-w-xs max-w-lg flex flex-col gap-2">
 									<p className="font-normal text-sm text-neutral-800">Embed Google Maps</p>
 									<EditableText
+										placeholder="<iframe src='..."
 										value={data?.address_embed || ""}
 										onUpdate={(val) => handleUpdateText("address_embed", val)}
 										className="w-full break-all"

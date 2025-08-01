@@ -20,7 +20,6 @@ const storage = new Storage({
 		client_email: clientEmail
 	}
 });
-
 const bucket = storage.bucket(process.env.GCP_STORAGE_BUCKET!);
 
 export { firestore, bucket };

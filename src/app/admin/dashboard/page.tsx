@@ -95,7 +95,7 @@ export default function AdminDashboard() {
 								>
 									<option value="">Semua Kategori</option>
 									{categories.map((category, i) => (
-										<option key={i} value={category}>
+										<option key={i} value={category} className="capitalize">
 											{category}
 										</option>
 									))}

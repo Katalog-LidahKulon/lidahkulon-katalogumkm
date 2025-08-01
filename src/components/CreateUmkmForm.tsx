@@ -23,13 +23,66 @@ const categories = [
 const SUPPORTED_FORMATS = ["image/jpg", "image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ImgSchema = Yup.mixed<File>()
-	.optional()
-	.test(
-		"fileFormat",
-		"Format file tidak didukung (hanya jpg, jpeg, png, webp)",
-		(value) => value && SUPPORTED_FORMATS.includes(value.type)
-	)
-	.test("fileSize", "Ukuran file maksimal 10MB", (value) => value && value.size <= MAX_FILE_SIZE);
+	.notRequired()
+	.test("fileFormat", "Format file tidak didukung (hanya jpg, jpeg, png, webp)", (value) => {
+		if (!value) return true;
+		return SUPPORTED_FORMATS.includes(value.type);
+	})
+	.test("fileSize", "Ukuran file maksimal 10MB", (value) => {
+		if (!value) return true;
+		return value.size <= MAX_FILE_SIZE;
+	});
+
+const initValue = {
+	name: "",
+	owner: "",
+	category: "",
+	description: "",
+	address: "",
+	address_embed: "",
+	phone: "",
+	email: "",
+	instagram: "",
+	tiktok: "",
+	facebook: "",
+	youtube: "",
+	website: "",
+	img_tn: null,
+	img_pd_1: null,
+	img_pd_2: null,
+	img_pd_3: null,
+	img_pd_4: null,
+	img_pd_5: null
+};
+const valueSchema = Yup.object().shape({
+	name: Yup.string().max(200, "Nama UMKM tidak boleh lebih dari 200 karakter").required("Nama UMKM wajib diisi"),
+	owner: Yup.string().max(200, "Nama pemilik tidak boleh lebih dari 200 karakter").required("Nama pemilik wajib diisi"),
+	category: Yup.string().max(100, "Kategori tidak boleh lebih dari 100 karakter").required("Kategori wajib diisi"),
+	description: Yup.string()
+		.max(2000, "Deskripsi tidak boleh lebih dari 2000 karakter")
+		.required("Deskripsi wajib diisi"),
+	address: Yup.string().max(500, "Alamat tidak boleh lebih dari 500 karakter").required("Alamat wajib diisi"),
+	address_embed: Yup.string()
+		.max(1000, "Hasil salinan Embed Google Map tidak boleh lebih dari 1000 karakter")
+		.notRequired(),
+
+	phone: Yup.string().max(24, "Nomor Telepon tidak boleh lebih dari 20 karakter").notRequired(),
+	email: Yup.string().max(200, "Email tidak boleh lebih dari 200 karakter").notRequired(),
+
+	instagram: Yup.string().max(400, "Instagram url tidak boleh lebih dari 400 karakter").notRequired(),
+	tiktok: Yup.string().max(400, "Tiktok url tidak boleh lebih dari 400 karakter").notRequired(),
+	facebook: Yup.string().max(400, "Facebook url tidak boleh lebih dari 400 karakter").notRequired(),
+	youtube: Yup.string().max(400, "Youtube url tidak boleh lebih dari 400 karakter").notRequired(),
+	website: Yup.string().max(400, "Website url tidak boleh lebih dari 400 karakter").notRequired(),
+
+	img_tn: ImgSchema,
+	img_pd_1: ImgSchema,
+	img_pd_2: ImgSchema,
+	img_pd_3: ImgSchema,
+	img_pd_4: ImgSchema,
+	img_pd_5: ImgSchema
+});
+
 export default function CreateUmkmForm({
 	show,
 	setShow,
@@ -40,43 +93,20 @@ export default function CreateUmkmForm({
 	refetch: () => void;
 }) {
 	const [state, setState] = useState<{ loading: boolean; error: string | null }>({ loading: false, error: null });
-	const handleHide = () => {
-		setShow(false);
-	};
+	const handleHide = () => setShow(false);
 
 	if (!show) return null;
 
 	return (
 		<Formik
-			initialValues={{
-				name: "",
-				owner: "",
-				category: "",
-				description: "",
-				address: "",
-				address_embed: "",
-				phone: "",
-				email: "",
-				instagram: "",
-				tiktok: "",
-				facebook: "",
-				youtube: "",
-				website: "",
-				img_tn: null,
-				img_pd_1: null,
-				img_pd_2: null,
-				img_pd_3: null,
-				img_pd_4: null,
-				img_pd_5: null
-			}}
+			initialValues={initValue}
+			validationSchema={valueSchema}
 			onSubmit={async (values) => {
 				setState({ loading: true, error: null });
 
 				const formData = new FormData();
 				Object.entries(values).forEach(([key, val]: [string, unknown]) => {
-					if (val instanceof File) {
-						formData.append(key, val);
-					} else if (typeof val === "string") {
+					if (val instanceof File || typeof val === "string") {
 						formData.append(key, val);
 					}
 				});
@@ -91,44 +121,12 @@ export default function CreateUmkmForm({
 					setShow(false);
 					refetch();
 				} catch (error) {
-					setState((p) => ({ ...p, error: "Terjadi kesalahan, silahkan coba lagi!" }));
 					console.error("Gagal mengirim:", error);
+					setState((p) => ({ ...p, error: "Terjadi kesalahan, silahkan coba lagi!" }));
 				} finally {
 					setState((p) => ({ ...p, loading: false }));
 				}
 			}}
-			validationSchema={Yup.object().shape({
-				name: Yup.string().max(200, "Nama UMKM tidak boleh lebih dari 200 karakter").required("Nama UMKM wajib diisi"),
-				owner: Yup.string()
-					.max(200, "Nama pemilik tidak boleh lebih dari 200 karakter")
-					.required("Nama pemilik wajib diisi"),
-				category: Yup.string()
-					.max(100, "Kategori tidak boleh lebih dari 100 karakter")
-					.required("Kategori wajib diisi"),
-				description: Yup.string()
-					.max(2000, "Deskripsi tidak boleh lebih dari 2000 karakter")
-					.required("Deskripsi wajib diisi"),
-				address: Yup.string().max(500, "Alamat tidak boleh lebih dari 500 karakter").required("Alamat wajib diisi"),
-				address_embed: Yup.string()
-					.max(1000, "Hasil salinan Embed Google Map tidak boleh lebih dari 1000 karakter")
-					.notRequired(),
-
-				phone: Yup.string().max(24, "Nomor Telepon tidak boleh lebih dari 20 karakter").notRequired(),
-				email: Yup.string().max(200, "Email tidak boleh lebih dari 200 karakter").notRequired(),
-
-				instagram: Yup.string().max(400, "Instagram url tidak boleh lebih dari 400 karakter").notRequired(),
-				tiktok: Yup.string().max(400, "Tiktok url tidak boleh lebih dari 400 karakter").notRequired(),
-				facebook: Yup.string().max(400, "Facebook url tidak boleh lebih dari 400 karakter").notRequired(),
-				youtube: Yup.string().max(400, "Youtube url tidak boleh lebih dari 400 karakter").notRequired(),
-				website: Yup.string().max(400, "Website url tidak boleh lebih dari 400 karakter").notRequired(),
-
-				img_tn: ImgSchema,
-				img_pd_1: ImgSchema.notRequired(),
-				img_pd_2: ImgSchema.notRequired(),
-				img_pd_3: ImgSchema.notRequired(),
-				img_pd_4: ImgSchema.notRequired(),
-				img_pd_5: ImgSchema.notRequired()
-			})}
 		>
 			{({ handleSubmit, errors }) => (
 				<form
