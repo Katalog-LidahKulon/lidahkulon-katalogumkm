@@ -7,6 +7,7 @@ import { Formik, Field } from "formik";
 import * as Yup from "yup";
 import { CheckIcon, Cross1Icon } from "@radix-ui/react-icons";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const categories = [
 	"kuliner",
@@ -103,6 +104,7 @@ export default function CreateUmkmForm({
 			validationSchema={valueSchema}
 			onSubmit={async (values) => {
 				setState({ loading: true, error: null });
+				const loading = toast.loading("Mengirim data...");
 
 				const formData = new FormData();
 				Object.entries(values).forEach(([key, val]: [string, unknown]) => {
@@ -112,19 +114,20 @@ export default function CreateUmkmForm({
 				});
 
 				try {
-					const res = await fetch("/api/umkm", {
+					await fetch("/api/umkm", {
 						method: "POST",
 						body: formData
 					});
 
-					await res.json();
-					setShow(false);
 					refetch();
+					setState({ loading: false, error: null });
+					toast.success("Data berhasil dikirim!");
 				} catch (error) {
 					console.error("Gagal mengirim:", error);
-					setState((p) => ({ ...p, error: "Terjadi kesalahan, silahkan coba lagi!" }));
+					setState({ loading: false, error: "Gagal mengirim data" });
+					toast.error("Terjadi kesalahan, silahkan coba lagi!");
 				} finally {
-					setState((p) => ({ ...p, loading: false }));
+					toast.dismiss(loading);
 				}
 			}}
 		>

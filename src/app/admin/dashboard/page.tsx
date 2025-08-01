@@ -8,9 +8,12 @@ import { TrashIcon, PlusIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons"
 import { formatDate } from "@/lib/utils";
 import { useState, useEffect, useMemo } from "react";
 import CreateUmkmForm from "@/components/CreateUmkmForm";
+import { Toaster, toast } from "sonner";
 
 export default function AdminDashboard() {
 	const [refetched, setRefetched] = useState(1);
+	const handleRefetch = () => setRefetched((p) => p + 1);
+
 	const [data, setData] = useState<UmkmBase[]>([]);
 	const [filters, setFilters] = useState({ category: "", search: "" });
 	const categories = useMemo(
@@ -38,16 +41,25 @@ export default function AdminDashboard() {
 
 		return tempData;
 	}, [data, filters.category, filters.search]);
-	const handleDelete = async (id: string) => {
-		await fetch(`/api/umkm/${id}`, { method: "DELETE" });
 
-		const newData = data.filter((item) => item.id !== id);
-		setData(newData);
+	const handleDelete = async (id: string) => {
+		const loading = toast.loading("Menghapus data...");
+		try {
+			await fetch(`/api/umkm/${id}`, { method: "DELETE" });
+			const newData = data.filter((item) => item.id !== id);
+			setData(newData);
+
+			toast.success("Data berhasil dihapus!");
+		} catch (error) {
+			console.error(error);
+
+			toast.error("Terjadi kesalahan, silahkan coba lagi!");
+		} finally {
+			toast.dismiss(loading);
+		}
 	};
 
 	const [showModal, setShowModal] = useState(false);
-
-	const handleRefetch = () => setRefetched((p) => p + 1);
 
 	return (
 		<>
@@ -162,7 +174,7 @@ export default function AdminDashboard() {
 												<p className="text-neutral-900">{umkm.owner}</p>
 											</td>
 											<td className="px-6 py-4 whitespace-nowrap">
-												<p className="px-3 py-0.5 inline-flex text-xs tracking-wider font-medium rounded-full bg-neutral-200 text-neutral-700">
+												<p className="px-3 py-0.5 inline-flex text-xs tracking-wider font-medium capitalize rounded-full bg-neutral-200 text-neutral-700">
 													{umkm.category}
 												</p>
 											</td>
@@ -193,6 +205,8 @@ export default function AdminDashboard() {
 			</main>
 
 			<Footer />
+
+			<Toaster position="bottom-right" expand />
 		</>
 	);
 }

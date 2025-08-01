@@ -17,6 +17,7 @@ import { UmkmDetail } from "@/types/Umkm";
 import { EditableText } from "@/components/shared/EditableText";
 import EditableImage from "@/components/shared/EditableImage";
 import { Pencil2Icon } from "@radix-ui/react-icons";
+import { Toaster, toast } from "sonner";
 
 const categories = [
 	"Kuliner",
@@ -48,6 +49,8 @@ export default function AdminUmkmDetail() {
 	}, [refetch, umkmId]);
 
 	const handleUpdateText = async (name: string, val: string) => {
+		const loading = toast.loading("Memperbarui data...");
+
 		try {
 			const form = new FormData();
 			form.append(name, val);
@@ -58,15 +61,21 @@ export default function AdminUmkmDetail() {
 			});
 
 			setRefetch((p) => p + 1);
+
+			toast.success("Data berhasil diperbarui!");
 		} catch (error) {
 			console.error(error);
+
+			toast.error("Terjadi kesalahan, silahkan coba lagi!");
+		} finally {
+			toast.dismiss(loading);
 		}
 	};
 
 	const handleUpdateImage = async (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
 		const files = e.target.files;
-
 		if (files && files[0]) {
+			const loading = toast.loading("Memperbarui gambar...");
 			const formData = new FormData();
 			formData.append(name, files[0]);
 
@@ -76,8 +85,14 @@ export default function AdminUmkmDetail() {
 					body: formData
 				});
 				setRefetch((p) => p + 1);
+
+				toast.success("Gambar berhasil diperbarui!");
 			} catch (error) {
 				console.error(error);
+
+				toast.error("Terjadi kesalahan, silahkan coba lagi!");
+			} finally {
+				toast.dismiss(loading);
 			}
 		}
 	};
@@ -89,7 +104,7 @@ export default function AdminUmkmDetail() {
 			<main>
 				<section className="w-full min-h-screen pt-24 pb-16">
 					{/* Instruction */}
-					<p className="pb-8 px-4 sm:px-8 lg:px-16 text-lg text-primary text-center">
+					<p className="pb-8 px-4 sm:px-8 lg:px-16 text-primary text-center">
 						Elemenen dengan ikon <Pencil2Icon className="size-5 text-primary inline mx-1" /> dapat langsung di edit
 						untuk memperbarui data.
 					</p>
@@ -141,101 +156,85 @@ export default function AdminUmkmDetail() {
 							{/* Contact */}
 							<h6 className="mt-10 font-medium text-lg text-neutral-800">Kontak</h6>
 							<div className="mt-1 text-sm sm:text-base grid grid-cols-1 sm:grid-cols-2 gap-2">
-								{data?.contacts?.phone && (
-									<p className="flex gap-8">
-										<SvgPhone />
-										<EditableText
-											placeholder="Nomor Telepon"
-											value={data?.contacts?.phone || ""}
-											onUpdate={(val) => handleUpdateText("phone", val)}
-										/>
-									</p>
-								)}
-								{data?.contacts?.email && (
-									<p className="flex gap-8">
-										<SvgSms />
-										<EditableText
-											placeholder="Email"
-											value={data?.contacts?.email || ""}
-											onUpdate={(val) => handleUpdateText("email", val)}
-										/>
-									</p>
-								)}
+								<p className="flex gap-8">
+									<SvgPhone />
+									<EditableText
+										placeholder="Isi No. Telp..."
+										value={data?.contacts?.phone || ""}
+										onUpdate={(val) => handleUpdateText("phone", val)}
+									/>
+								</p>
+								<p className="flex gap-8">
+									<SvgSms />
+									<EditableText
+										placeholder="Isi Email..."
+										value={data?.contacts?.email || ""}
+										onUpdate={(val) => handleUpdateText("email", val)}
+									/>
+								</p>
 							</div>
 
 							{/* Links */}
 							<h6 className="mt-10 font-medium text-lg text-neutral-800">Tautan & Media Sosial</h6>
 							<div className="mt-1 text-sm sm:text-base grid grid-cols-1 sm:grid-cols-2 gap-2">
-								{data?.links?.instagram && (
-									<p className="flex gap-8">
-										<SvgSocial4 />
-										<EditableText
-											placeholder="Instagram"
-											value={data?.links?.instagram || ""}
-											onUpdate={(val) => handleUpdateText("instagram", val)}
-										/>
-									</p>
-								)}
-								{data?.links?.tiktok && (
-									<p className="flex gap-8">
-										<SvgSocial1 />
-										<EditableText
-											placeholder="Tiktok"
-											value={data?.links?.tiktok || ""}
-											onUpdate={(val) => handleUpdateText("tiktok", val)}
-										/>
-									</p>
-								)}
-								{data?.links?.facebook && (
-									<p className="flex gap-8">
-										<SvgSocial2 />
-										<EditableText
-											placeholder="Facebook"
-											value={data?.links?.facebook || ""}
-											onUpdate={(val) => handleUpdateText("facebook", val)}
-										/>
-									</p>
-								)}
-								{data?.links?.youtube && (
-									<p className="flex gap-8">
-										<SvgSocial3 />
-										<EditableText
-											placeholder="Youtube"
-											value={data?.links?.youtube || ""}
-											onUpdate={(val) => handleUpdateText("youtube", val)}
-										/>
-									</p>
-								)}
-								{data?.links?.website && (
-									<p className="flex gap-8">
-										<SvgGlobe />
-										<EditableText
-											placeholder="Website"
-											value={data?.links?.website || ""}
-											onUpdate={(val) => handleUpdateText("website", val)}
-										/>
-									</p>
-								)}
+								<p className="flex gap-8">
+									<SvgSocial4 />
+									<EditableText
+										placeholder="Isi Url Instagram..."
+										value={data?.links?.instagram || ""}
+										onUpdate={(val) => handleUpdateText("instagram", val)}
+									/>
+								</p>
+								<p className="flex gap-8">
+									<SvgSocial1 />
+									<EditableText
+										placeholder="Isi Url Tiktok..."
+										value={data?.links?.tiktok || ""}
+										onUpdate={(val) => handleUpdateText("tiktok", val)}
+									/>
+								</p>
+								<p className="flex gap-8">
+									<SvgSocial2 />
+									<EditableText
+										placeholder="Isi Url Facebook..."
+										value={data?.links?.facebook || ""}
+										onUpdate={(val) => handleUpdateText("facebook", val)}
+									/>
+								</p>
+								<p className="flex gap-8">
+									<SvgSocial3 />
+									<EditableText
+										placeholder="Isi Url Youtube..."
+										value={data?.links?.youtube || ""}
+										onUpdate={(val) => handleUpdateText("youtube", val)}
+									/>
+								</p>
+								<p className="flex gap-8">
+									<SvgGlobe />
+									<EditableText
+										placeholder="Isi Url Website..."
+										value={data?.links?.website || ""}
+										onUpdate={(val) => handleUpdateText("website", val)}
+									/>
+								</p>
 							</div>
 
 							{/* Address */}
 							<h6 className="mt-10 font-medium text-lg text-neutral-800">Alamat</h6>
 							<div className="mt-1">
-								{data?.address && (
-									<p className="flex gap-8">
-										<SvgMap />
-										<EditableText
-											placeholder="Alamat UMKM"
-											value={data?.address || ""}
-											onUpdate={(val) => handleUpdateText("address", val)}
-										/>
-									</p>
-								)}
+								<p className="flex gap-8">
+									<SvgMap />
+									<EditableText
+										placeholder="Isi Alamat UMKM..."
+										value={data?.address || ""}
+										onUpdate={(val) => handleUpdateText("address", val)}
+									/>
+								</p>
 								{/* Embed Google Maps */}
 								<div className="mt-2 w-10/12 min-w-xs max-w-lg flex flex-col gap-2">
 									<p className="font-normal text-sm text-neutral-800">Embed Google Maps</p>
 									<EditableText
-										placeholder="<iframe src='..."
+										placeholder="Isi salinan embed <iframe src='..."
 										value={data?.address_embed || ""}
 										onUpdate={(val) => handleUpdateText("address_embed", val)}
 										className="w-full break-all"
@@ -255,11 +254,9 @@ export default function AdminUmkmDetail() {
 							<EditableImage
 								src={data?.images?.thumbnail || ""}
 								onUpdate={(e) => handleUpdateImage(e, "img_tn")}
-								onDropFiles={(files: FileList) => {
-									if (files && files[0]) {
-										handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_tn");
-									}
-								}}
+								onDropFiles={(files: FileList) =>
+									handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_tn")
+								}
 								className="w-full max-w-sm aspect-[2/3] object-cover object-center"
 							/>
 						</div>
@@ -272,9 +269,7 @@ export default function AdminUmkmDetail() {
 								src={data?.images?.products?.["1"] || ""}
 								onUpdate={(e) => handleUpdateImage(e, "img_pd_1")}
 								onDropFiles={(files: FileList) => {
-									if (files && files[0]) {
-										handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_1");
-									}
+									handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_1");
 								}}
 								className="w-full aspect-[2/1] object-cover object-center"
 							/>
@@ -282,9 +277,7 @@ export default function AdminUmkmDetail() {
 								src={data?.images?.products?.["2"] || ""}
 								onUpdate={(e) => handleUpdateImage(e, "img_pd_2")}
 								onDropFiles={(files: FileList) => {
-									if (files && files[0]) {
-										handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_2");
-									}
+									handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_2");
 								}}
 								className="w-full aspect-[2/1] object-cover object-center"
 							/>
@@ -295,9 +288,7 @@ export default function AdminUmkmDetail() {
 									src={data?.images?.products?.["3"] || ""}
 									onUpdate={(e) => handleUpdateImage(e, "img_pd_3")}
 									onDropFiles={(files: FileList) => {
-										if (files && files[0]) {
-											handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_3");
-										}
+										handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_3");
 									}}
 									className="w-full aspect-[1/1] object-cover object-center"
 								/>
@@ -305,9 +296,7 @@ export default function AdminUmkmDetail() {
 									src={data?.images?.products?.["4"] || ""}
 									onUpdate={(e) => handleUpdateImage(e, "img_pd_4")}
 									onDropFiles={(files: FileList) => {
-										if (files && files[0]) {
-											handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_4");
-										}
+										handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_4");
 									}}
 									className="w-full aspect-[1/1] object-cover object-center"
 								/>
@@ -316,9 +305,7 @@ export default function AdminUmkmDetail() {
 								src={data?.images?.products?.["5"] || ""}
 								onUpdate={(e) => handleUpdateImage(e, "img_pd_5")}
 								onDropFiles={(files: FileList) => {
-									if (files && files[0]) {
-										handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_5");
-									}
+									handleUpdateImage({ target: { files } } as React.ChangeEvent<HTMLInputElement>, "img_pd_5");
 								}}
 								className="w-full aspect-[2/1] object-cover object-center"
 							/>
@@ -328,6 +315,8 @@ export default function AdminUmkmDetail() {
 			</main>
 
 			<Footer />
+
+			<Toaster position="bottom-right" expand />
 		</>
 	);
 }
