@@ -141,18 +141,19 @@ export default function AdminUmkmDetail() {
 
 									<div className="h-1 aspect-square rounded-full bg-neutral-500" />
 
-									<select
-										value={data?.category}
-										defaultValue={data?.category}
-										onChange={(e) => handleUpdateText("category", e.target.value)}
-										className="cursor-pointer border border-neutral-400 capitalize"
-									>
-										{categories.map((item, i) => (
-											<option key={i} value={item} className="capitalize">
-												{item}
-											</option>
-										))}
-									</select>
+									{data?.category && (
+										<select
+											value={data.category}
+											onChange={(e) => handleUpdateText("category", e.target.value)}
+											className="cursor-pointer border border-neutral-400 capitalize"
+										>
+											{categories.map((item, i) => (
+												<option key={i} value={item} className="capitalize">
+													{item}
+												</option>
+											))}
+										</select>
+									)}
 
 									<div className="h-1 aspect-square rounded-full bg-neutral-500" />
 

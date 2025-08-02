@@ -20,15 +20,6 @@ export default function AdminDashboard() {
 		() => data.map((item) => item.category).filter((value, index, self) => self.indexOf(value) === index),
 		[data]
 	);
-	useEffect(() => {
-		const getData = async () => {
-			const res = await fetch("/api/umkm");
-			const data = await res.json();
-
-			setData(data.data as UmkmBase[]);
-		};
-		getData();
-	}, [refetched]);
 	const filteredData = useMemo(() => {
 		let tempData = data;
 
@@ -42,13 +33,32 @@ export default function AdminDashboard() {
 		return tempData;
 	}, [data, filters.category, filters.search]);
 
+	const [showModal, setShowModal] = useState(false);
+
+	useEffect(() => {
+		const getData = async () => {
+			const res = await fetch("/api/umkm");
+			const data = await res.json();
+
+			setData(data.data as UmkmBase[]);
+		};
+		getData();
+		setShowModal(false);
+	}, [refetched]);
+
 	const handleDelete = async (id: string) => {
+		if (!confirm("Anda yakin ingin menghapus data ini?")) return;
+
 		const loading = toast.loading("Menghapus data...");
 		try {
-			await fetch(`/api/umkm/${id}`, { method: "DELETE" });
-			const newData = data.filter((item) => item.id !== id);
-			setData(newData);
+			const res = await fetch(`/api/umkm/${id}`, { method: "DELETE" });
+			if (!res.ok) {
+				const errData = await res.json();
+				toast.error(errData.message || "Gagal menghapus data.");
+				return;
+			}
 
+			handleRefetch();
 			toast.success("Data berhasil dihapus!");
 		} catch (error) {
 			console.error(error);
@@ -58,8 +68,6 @@ export default function AdminDashboard() {
 			toast.dismiss(loading);
 		}
 	};
-
-	const [showModal, setShowModal] = useState(false);
 
 	return (
 		<>
