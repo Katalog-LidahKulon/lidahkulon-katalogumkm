@@ -143,6 +143,7 @@ export default function AdminUmkmDetail() {
 
 									<select
 										value={data?.category}
+										defaultValue={data?.category}
 										onChange={(e) => handleUpdateText("category", e.target.value)}
 										className="cursor-pointer border border-neutral-400 capitalize"
 									>

@@ -286,7 +286,7 @@ export default function PageUmkm() {
 									key={i}
 									type="button"
 									onClick={() => scrollToCategory(category)}
-									className="cursor-pointer underline underline-offset-2 hover:text-primary"
+									className="cursor-pointer underline underline-offset-2 hover:text-primary capitalize"
 								>
 									{category}
 								</button>
@@ -330,7 +330,7 @@ export default function PageUmkm() {
 						{/* Umkm Lists */}
 						{Object.entries(groupedData).map(([category, value], i) => (
 							<div key={i} id={`category-${category}`} className="w-full mb-12">
-								<h2 className="mb-6 font-playfair text-2xl md:text-3xl text-neutral-700">{category}</h2>
+								<h2 className="mb-6 font-playfair text-2xl md:text-3xl text-neutral-700 capitalize">{category}</h2>
 
 								<div className="w-full overflow-auto flex gap-4 items-start">
 									{/* Item Cards */}
