@@ -55,18 +55,22 @@ export default function AdminUmkmDetail() {
 			const form = new FormData();
 			form.append(name, val);
 
-			await fetch(`/api/umkm/${umkmId}`, {
+			const res = await fetch(`/api/umkm/${umkmId}`, {
 				method: "PATCH",
 				body: form
 			});
 
-			setRefetch((p) => p + 1);
+			if (!res.ok) {
+				const errData = await res.json();
+				toast.error(errData.message || "Gagal memperbarui data.");
+				return;
+			}
 
+			setRefetch((p) => p + 1);
 			toast.success("Data berhasil diperbarui!");
 		} catch (error) {
-			console.error(error);
-
-			toast.error("Terjadi kesalahan, silahkan coba lagi!");
+			console.error("Update error:", error);
+			toast.error("Terjadi kesalahan saat memperbarui data.");
 		} finally {
 			toast.dismiss(loading);
 		}
@@ -80,16 +84,21 @@ export default function AdminUmkmDetail() {
 			formData.append(name, files[0]);
 
 			try {
-				await fetch(`/api/umkm/${umkmId}`, {
+				const res = await fetch(`/api/umkm/${umkmId}`, {
 					method: "PATCH",
 					body: formData
 				});
-				setRefetch((p) => p + 1);
 
+				if (!res.ok) {
+					const errData = await res.json();
+					toast.error(errData.message || "Gagal memperbarui gambar.");
+					return;
+				}
+
+				setRefetch((p) => p + 1);
 				toast.success("Gambar berhasil diperbarui!");
 			} catch (error) {
 				console.error(error);
-
 				toast.error("Terjadi kesalahan, silahkan coba lagi!");
 			} finally {
 				toast.dismiss(loading);
@@ -113,25 +122,29 @@ export default function AdminUmkmDetail() {
 						<div>
 							{/* Main Info */}
 							<div>
-								<EditableText
-									placeholder="Nama UMKM"
-									value={data?.name || ""}
-									onUpdate={(val) => handleUpdateText("name", val)}
-									className="font-playfair text-3xl sm:text-4xl md:text-5xl text-neutral-800"
-								/>
-
-								<div className="flex flex-wrap gap-x-2 items-baseline">
+								<h1 className="w-fit font-playfair text-3xl sm:text-4xl md:text-5xl text-neutral-800">
 									<EditableText
-										placeholder="Pemilik UMKM"
-										value={data?.owner || ""}
-										onUpdate={(val) => handleUpdateText("owner", val)}
-										className="font-normal text-lg text-neutral-800"
+										placeholder="Nama UMKM"
+										value={data?.name || ""}
+										onUpdate={(val) => handleUpdateText("name", val)}
 									/>
+								</h1>
+
+								<div className="flex flex-wrap gap-x-2 items-center">
+									<p className="w-fit font-normal text-lg text-neutral-800">
+										<EditableText
+											placeholder="Pemilik UMKM"
+											value={data?.owner || ""}
+											onUpdate={(val) => handleUpdateText("owner", val)}
+										/>
+									</p>
+
 									<div className="h-1 aspect-square rounded-full bg-neutral-500" />
+
 									<select
 										value={data?.category}
 										onChange={(e) => handleUpdateText("category", e.target.value)}
-										className="border border-neutral-400"
+										className="cursor-pointer border border-neutral-400"
 									>
 										{categories.map((item, i) => (
 											<option key={i} value={item}>
@@ -139,33 +152,34 @@ export default function AdminUmkmDetail() {
 											</option>
 										))}
 									</select>
+
 									<div className="h-1 aspect-square rounded-full bg-neutral-500" />
-									<p className="text-sm">{data?.created_at && formatDate(data.created_at)}</p>
+
+									<p className="w-fit text-sm">{data?.created_at && formatDate(data.created_at)}</p>
 								</div>
 							</div>
 
-							<p className="w-10/12 min-w-xs max-w-lg">
+							<p className="mt-10 w-10/12 min-w-xs max-w-lg text-justify text-sm text-neutral-700">
 								<EditableText
 									placeholder="Deskripsi UMKM"
 									value={data?.description || ""}
 									onUpdate={(val) => handleUpdateText("description", val)}
-									className="w-full min-w-xs max-w-lg mt-10 text-justify text-sm text-neutral-700 break-all"
 								/>
 							</p>
 
 							{/* Contact */}
 							<h6 className="mt-10 font-medium text-lg text-neutral-800">Kontak</h6>
 							<div className="mt-1 text-sm sm:text-base grid grid-cols-1 sm:grid-cols-2 gap-2">
-								<p className="flex gap-8">
-									<SvgPhone />
+								<p className="w-fit flex gap-2">
+									<SvgPhone className="shrink-0" />
 									<EditableText
 										placeholder="Isi No. Telp..."
 										value={data?.contacts?.phone || ""}
 										onUpdate={(val) => handleUpdateText("phone", val)}
 									/>
 								</p>
-								<p className="flex gap-8">
-									<SvgSms />
+								<p className="w-fit flex gap-2">
+									<SvgSms className="shrink-0" />
 									<EditableText
 										placeholder="Isi Email..."
 										value={data?.contacts?.email || ""}
@@ -177,40 +191,40 @@ export default function AdminUmkmDetail() {
 							{/* Links */}
 							<h6 className="mt-10 font-medium text-lg text-neutral-800">Tautan & Media Sosial</h6>
 							<div className="mt-1 text-sm sm:text-base grid grid-cols-1 sm:grid-cols-2 gap-2">
-								<p className="flex gap-8">
-									<SvgSocial4 />
+								<p className="flex gap-2">
+									<SvgSocial4 className="shrink-0" />
 									<EditableText
 										placeholder="Isi Url Instagram..."
 										value={data?.links?.instagram || ""}
 										onUpdate={(val) => handleUpdateText("instagram", val)}
 									/>
 								</p>
-								<p className="flex gap-8">
-									<SvgSocial1 />
+								<p className="flex gap-2">
+									<SvgSocial1 className="shrink-0" />
 									<EditableText
 										placeholder="Isi Url Tiktok..."
 										value={data?.links?.tiktok || ""}
 										onUpdate={(val) => handleUpdateText("tiktok", val)}
 									/>
 								</p>
-								<p className="flex gap-8">
-									<SvgSocial2 />
+								<p className="flex gap-2">
+									<SvgSocial2 className="shrink-0" />
 									<EditableText
 										placeholder="Isi Url Facebook..."
 										value={data?.links?.facebook || ""}
 										onUpdate={(val) => handleUpdateText("facebook", val)}
 									/>
 								</p>
-								<p className="flex gap-8">
-									<SvgSocial3 />
+								<p className="flex gap-2">
+									<SvgSocial3 className="shrink-0" />
 									<EditableText
 										placeholder="Isi Url Youtube..."
 										value={data?.links?.youtube || ""}
 										onUpdate={(val) => handleUpdateText("youtube", val)}
 									/>
 								</p>
-								<p className="flex gap-8">
-									<SvgGlobe />
+								<p className="flex gap-2">
+									<SvgGlobe className="shrink-0" />
 									<EditableText
 										placeholder="Isi Url Website..."
 										value={data?.links?.website || ""}
@@ -222,8 +236,8 @@ export default function AdminUmkmDetail() {
 							{/* Address */}
 							<h6 className="mt-10 font-medium text-lg text-neutral-800">Alamat</h6>
 							<div className="mt-1">
-								<p className="flex gap-8">
-									<SvgMap />
+								<p className="flex gap-2">
+									<SvgMap className="shrink-0" />
 									<EditableText
 										placeholder="Isi Alamat UMKM..."
 										value={data?.address || ""}
