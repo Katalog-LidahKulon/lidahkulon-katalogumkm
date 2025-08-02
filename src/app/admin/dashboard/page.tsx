@@ -103,7 +103,7 @@ export default function AdminDashboard() {
 								<select
 									value={filters.category}
 									onChange={(e) => setFilters((p) => ({ ...p, category: e.target.value }))}
-									className="bg-neutral-100 border-2 border-neutral-300 rounded-lg px-3 py-2 focus:outline-0 focus:border-primary"
+									className="bg-neutral-100 border-2 border-neutral-300 rounded-lg px-3 py-2 focus:outline-0 focus:border-primary capitalize"
 								>
 									<option value="">Semua Kategori</option>
 									{categories.map((category, i) => (

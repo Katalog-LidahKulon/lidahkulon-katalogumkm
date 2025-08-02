@@ -20,15 +20,15 @@ import { Pencil2Icon } from "@radix-ui/react-icons";
 import { Toaster, toast } from "sonner";
 
 const categories = [
-	"Kuliner",
-	"Kerajinan",
-	"Fashion",
-	"Jasa",
-	"Furniture",
-	"Ritel",
-	"Pertanian",
-	"Peternakan",
-	"Kesehatan"
+	"kuliner",
+	"kerajinan",
+	"fashion",
+	"jasa",
+	"furniture",
+	"ritel",
+	"pertanian",
+	"peternakan",
+	"kesehatan"
 ];
 
 export default function AdminUmkmDetail() {
@@ -144,10 +144,10 @@ export default function AdminUmkmDetail() {
 									<select
 										value={data?.category}
 										onChange={(e) => handleUpdateText("category", e.target.value)}
-										className="cursor-pointer border border-neutral-400"
+										className="cursor-pointer border border-neutral-400 capitalize"
 									>
 										{categories.map((item, i) => (
-											<option key={i} value={item}>
+											<option key={i} value={item} className="capitalize">
 												{item}
 											</option>
 										))}

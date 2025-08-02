@@ -114,10 +114,16 @@ export default function CreateUmkmForm({
 				});
 
 				try {
-					await fetch("/api/umkm", {
+					const res = await fetch("/api/umkm", {
 						method: "POST",
 						body: formData
 					});
+
+					if (!res.ok) {
+						const errData = await res.json();
+						toast.error(errData.message || "Gagal mengirim data.");
+						return;
+					}
 
 					refetch();
 					setState({ loading: false, error: null });

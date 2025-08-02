@@ -31,9 +31,13 @@ export default async function PageUmkmDetail({ params }: { params: Promise<{ id:
 
 								<div className="flex flex-wrap gap-x-2 items-baseline">
 									<p className="font-normal text-lg text-neutral-800">{data?.owner}</p>
+
 									<div className="h-1 aspect-square rounded-full bg-neutral-500" />
-									<p className="text-sm">{data?.category}</p>
+
+									<p className="text-sm capitalize">{data?.category}</p>
+
 									<div className="h-1 aspect-square rounded-full bg-neutral-500" />
+
 									<p className="text-sm">{formatDate(data?.created_at)}</p>
 								</div>
 							</div>
