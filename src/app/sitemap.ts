@@ -1,16 +1,16 @@
 import { UmkmBase } from "@/types/Umkm";
+import { getUmkmList } from "@/lib/data/umkm";
 
 export const revalidate = 86400; // 1 day
 
 export default async function sitemap() {
-	let umkmData = [];
+	let umkmData: UmkmBase[] = [];
 
 	try {
-		const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/umkm`);
-		const body = await res.json();
-		umkmData = body.data;
+		const data = await getUmkmList();
+		umkmData = data;
 	} catch (error) {
-		console.error("Expected build error:", error);
+		console.error("[SITEMAP] Error getting umkm data: ", error);
 	}
 
 	let detailUmkmUrls: { url: string; lastModified: Date; changeFrequency: string; priority: number }[] = [];
