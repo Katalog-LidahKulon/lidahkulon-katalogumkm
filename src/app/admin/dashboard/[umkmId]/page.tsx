@@ -18,6 +18,7 @@ import { EditableText } from "@/components/shared/EditableText";
 import EditableImage from "@/components/shared/EditableImage";
 import { Pencil2Icon } from "@radix-ui/react-icons";
 import { Toaster, toast } from "sonner";
+import Link from "next/link";
 
 const categories = [
 	"kuliner",
@@ -115,7 +116,14 @@ export default function AdminUmkmDetail() {
 					{/* Instruction */}
 					<p className="pb-8 px-4 sm:px-8 lg:px-16 text-primary text-center">
 						Elemenen dengan ikon <Pencil2Icon className="size-5 text-primary inline mx-1" /> dapat langsung di edit
-						untuk memperbarui data.
+						untuk memperbarui data{" "}
+						<Link
+							target="_blank"
+							href="/file/panduan-penggunaan.pdf"
+							className="text-primary underline underline-offset-2"
+						>
+							Lihat Panduan
+						</Link>
 					</p>
 
 					<div className="w-full h-fit grid grid-flow-row md:grid-cols-2 gap-x-4 gap-y-8 md:gap-8 px-6 sm:px-8 lg:px-16">

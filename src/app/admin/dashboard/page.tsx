@@ -73,7 +73,14 @@ export default function AdminDashboard() {
 		<>
 			<Header />
 
-			<main className="min-h-screen bg-neutral-100 pt-32 pb-16">
+			<main className="relative min-h-screen bg-neutral-100 pt-32 pb-16">
+				<p className="absolute top-18 left-1/2 -translate-x-1/2">
+					Jika terdapat kebingungan, Anda dapat melihat{" "}
+					<Link target="_blank" href="/file/panduan-penggunaan.pdf" className="underline underline-offset-2">
+						Panduan
+					</Link>
+				</p>
+
 				<div className="container mx-auto px-4">
 					<div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8">
 						<div>

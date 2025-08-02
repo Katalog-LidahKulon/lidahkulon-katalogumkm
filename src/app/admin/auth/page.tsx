@@ -5,6 +5,7 @@ import Footer from "@/components/layouts/Footer";
 import { useState } from "react";
 import SvgShow from "@/assets/svgs/Show";
 import SvgHide from "@/assets/svgs/Hide";
+import Link from "next/link";
 
 export default function AdminAuth() {
 	const [pass, setPass] = useState("");
@@ -46,7 +47,14 @@ export default function AdminAuth() {
 			<Header />
 
 			<main>
-				<section className="w-full min-h-screen flex justify-center items-center">
+				<section className="relative w-full min-h-screen flex justify-center items-center">
+					<p className="absolute bottom-6 left-1/2 -translate-x-1/2">
+						Jika terdapat kebingungan, Anda dapat melihat{" "}
+						<Link target="_blank" href="/file/panduan-penggunaan.pdf" className="underline underline-offset-2">
+							Panduan
+						</Link>
+					</p>
+
 					<div className="max-w-lg px-12 py-18 flex flex-col gap-12 shadow-xl">
 						<div>
 							<h1 className="font-playfair text-3xl md:text-4xl text-neutral-800">Admin Login</h1>
